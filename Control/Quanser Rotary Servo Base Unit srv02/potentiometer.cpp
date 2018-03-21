@@ -1,13 +1,37 @@
 #include <potentiometer.h>
+
+#define PI (float)(3.14159265358979)
+//HARDWARE INPUT
 uint8_t potentiometer_pin;
-uint16_t potentiometer_zero_ref = 0;
+
+//CALIBRATION VALUES
 bool potentiometer_is_set = false;
+uint16_t potentiometer_zero_ref = 0;
 float voltage = 5.0;
 uint16_t resolution = 1024;
+bool is_radian = true;
+float potentiometer_scale = PI * voltage;
 
-bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, float voltage, uint16_t resolution){
+
+bool potentiometer_is_radians(){
+    return(is_radian);
+}
+
+bool potentiometer_set_radians(bool radians){
+    is_radian = radians;
+    if(is_radian){
+        potentiometer_scale = 2 * PI * voltage;
+    }
+    else{
+        potentiometer_scale = 360 * voltage;
+    }
+
+}
+
+bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, float voltage, uint16_t resolution, bool radians){
   this->voltage = voltage;
   this->resolution = resolution;
+  potentiometer_set_radians(radians);
   return potentiometer_set(potentiometer_pin, set_zero_reference);
 }
 
@@ -26,17 +50,6 @@ bool set_zero_reference(){
   return true;
 }
 
-bool default_case(){
-  return (voltage == 5.0) && (resolution == 1024);
-}
-
 inline uint16_t potentiometer_get_value(){
-    if (default_case()){
-        //(voltage_potentiometer * voltage / resolution) * 360
-        //(voltage_potentiometer * 5 / 1024) * 360
-        return ((analogRead(PIN_POTE) - potentiometer_zero_ref) * 1800) >> 10;
-    }
-    else{
-      return ((analogRead(PIN_POTE) - potentiometer_zero_ref) * voltage * 360) / resolution;
-    }
+  return ((analogRead(PIN_POTE) - potentiometer_zero_ref) * voltage * potentiometer_scale) / resolution;
 }
