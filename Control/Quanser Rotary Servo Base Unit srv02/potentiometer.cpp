@@ -10,7 +10,7 @@ uint16_t potentiometer_zero_ref = 0;
 float voltage = 5.0;
 uint16_t resolution = 1024;
 bool is_radian = true;
-float potentiometer_scale = PI * voltage;
+float potentiometer_scale = 2 * PI * voltage;
 
 
 bool potentiometer_is_radians(){
