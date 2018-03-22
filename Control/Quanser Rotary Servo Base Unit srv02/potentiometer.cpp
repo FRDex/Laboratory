@@ -1,6 +1,9 @@
 #include <potentiometer.h>
 
-#define PI (float)(3.14159265358979)
+#ifndef __PI_DEFINED__
+#define __PI_DEFINED__
+  #define PI (float)(3.14159265358979)
+#endif
 //HARDWARE INPUT
 uint8_t potentiometer_pin;
 
@@ -10,7 +13,7 @@ uint16_t potentiometer_zero_ref = 0;
 float voltage = 5.0;
 uint16_t resolution = 1024;
 bool is_radian = true;
-float potentiometer_scale = 2 * PI * voltage;
+float potentiometer_scale = 2 * PI * voltage * tachometer_sensitivity;
 
 
 bool potentiometer_is_radians(){
@@ -39,17 +42,17 @@ bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference){
       this->potentiometer_pin = potentiometer_pin;
       pinMode(potentiometer_pin, INPUT);
       if(set_zero_reference){
-        set_zero_reference();
+        potentiometer_set_zero_reference();
       }
       potentiometer_is_set = true;
       return potentiometer_is_set;
 }
 
-bool set_zero_reference(){
-  potentiometer_zero_ref = analogRead(PIN_POTE);
+bool potentiometer_set_zero_reference(){
+  potentiometer_zero_ref = analogRead(potentiometer_pin);
   return true;
 }
 
 inline uint16_t potentiometer_get_value(){
-  return ((analogRead(PIN_POTE) - potentiometer_zero_ref) * voltage * potentiometer_scale) / resolution;
+  return ((analogRead(potentiometer_pin) - potentiometer_zero_ref) * potentiometer_scale) / resolution;
 }
