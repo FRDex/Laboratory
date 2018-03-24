@@ -1,5 +1,5 @@
 #include <potentiometer.h>
-// REFENCES
+// REFERENCES
 #ifndef __PI_DEFINED__
 #define __PI_DEFINED__
   #define PI (float)(3.14159265358979)
@@ -9,8 +9,8 @@
 uint8_t potentiometer_pin;
 
 /*CONDITIONS*/
-bool is_radian = true;
 bool potentiometer_is_set = false;
+bool is_radian = true;
 
 /*CALIBRATION VALUES*/
 uint16_t potentiometer_zero_ref = 0;
@@ -21,7 +21,7 @@ float potentiometer_scale = (2 * PI * voltage * tachometer_sensitivity) / resolu
 // FUNCTIONS DEFINITIONS
 
 /*POTENTIOMETER VALUE*/
-inline uint16_t potentiometer_get_value(){
+uint16_t potentiometer_get_value(){
   return (analogRead(potentiometer_pin) - potentiometer_zero_ref) * potentiometer_scale;
 }
 
@@ -30,7 +30,7 @@ bool potentiometer_is_radians(){
 }
 
 /*SETUP*/
-bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, float voltage, uint16_t resolution, bool radians){
+bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, bool radians, float voltage, uint16_t resolution){
   this->potentiometer_pin = potentiometer_pin;
   this->voltage = voltage;
   this->resolution = resolution;
@@ -44,7 +44,7 @@ bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, float
 }
 
 bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference){
-      return potentiometer_set(potentiometer_pin, set_zero_reference, 5.0, 1024, true);
+      return potentiometer_set(potentiometer_pin, set_zero_reference, true, 5.0, 1024);
 }
 
 bool potentiometer_set_zero_reference(){
@@ -65,4 +65,5 @@ bool potentiometer_set_radians(bool radians){
     else{
         potentiometer_scale = (360 * voltage) / resolution;
     }
+    return is_radian;
 }
