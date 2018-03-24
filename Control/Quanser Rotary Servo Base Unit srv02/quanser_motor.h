@@ -1,5 +1,5 @@
-#ifndef __quadrature_encoder_H_INCLUDED__
-#define __quadrature_encoder_H_INCLUDED__
+#ifndef __QUANSER_MOTOR_H_INCLUDED__
+#define __QUANSER_MOTOR_H_INCLUDED__
 
 /*MOVE MOTORS*/
 bool motor_move(bool move_clockwise);

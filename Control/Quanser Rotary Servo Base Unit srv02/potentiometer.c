@@ -1,7 +1,7 @@
 #include <potentiometer.h>
 // REFERENCES
 #ifndef __PI_DEFINED__
-#define __PI_DEFINED__
+  #define __PI_DEFINED__
   #define PI (float)(3.14159265358979)
 #endif
 
@@ -16,7 +16,7 @@ static bool is_radian = true;
 static uint16_t potentiometer_zero_ref = 0;
 static float voltage = 5.0;
 static uint16_t resolution = 1024;
-static float potentiometer_scale = (2 * PI * voltage * tachometer_sensitivity) / resolution;
+static float potentiometer_scale = (2 * PI * voltage) / resolution;
 
 // FUNCTIONS DEFINITIONS
 

@@ -1,5 +1,5 @@
-#ifndef __quanser_samples_H_INCLUDED__
-#define __quanser_samples_H_INCLUDED__
+#ifndef __QUANSER_SAMPLES_H_INCLUDED__
+#define __QUANSER_SAMPLES_H_INCLUDED__
 
 void get_quanser_samples();
 

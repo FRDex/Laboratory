@@ -1,5 +1,5 @@
-#ifndef __quadrature_encoder_H_INCLUDED__
-#define __quadrature_encoder_H_INCLUDED__
+#ifndef __QUADRATURE_ENCODER_H_INCLUDED__
+#define __QUADRATURE_ENCODER_H_INCLUDED__
 
 /*POSITION DATA RELATED*/
 inline int16_t encoder_get_value();

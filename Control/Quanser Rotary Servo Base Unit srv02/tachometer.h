@@ -1,5 +1,5 @@
-#ifndef __tachometer_H_INCLUDED__
-#define __tachometer_H_INCLUDED__
+#ifndef __TACHOMETER_H_INCLUDED__
+#define __TACHOMETER_H_INCLUDED__
 
 /*TACHOMETER VALUE*/
 uint16_t tachometer_get_value();  // VALUE MIGHT BE IN RADIANS/DEGREES DEPENDING ON CONFIG (DEFAULT: RADIANS)
