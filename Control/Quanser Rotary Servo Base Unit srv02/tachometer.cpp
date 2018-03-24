@@ -6,18 +6,18 @@
 #endif
 
 /*HARDWARE INPUT*/
-uint8_t tachometer_pin;
+static uint8_t tachometer_pin;
 
 /*CONDITIONS*/
-bool tachometer_is_set = false;
-bool is_radian = true;
+static bool tachometer_is_set = false;
+static bool is_radian = true;
 
 /*CALIBRATION VALUES*/
-uint16_t tachometer_zero_ref = 0;
-float voltage = 5.0;
-uint16_t resolution = 1024;
-uint16_t tachometer_sensitivity = 1500; // rpm/V
-float tachometer_scale = (2 * PI * voltage * tachometer_sensitivity) / (60 * resolution);
+static uint16_t tachometer_zero_ref = 0;
+static float voltage = 5.0;
+static uint16_t resolution = 1024;
+static uint16_t tachometer_sensitivity = 1500; // rpm/V
+static float tachometer_scale = (2 * PI * voltage * tachometer_sensitivity) / (60 * resolution);
 
 // FUNCTIONS DEFINITIONS
 

@@ -6,17 +6,17 @@
 #endif
 
 /*HARDWARE INPUT*/
-uint8_t potentiometer_pin;
+static uint8_t potentiometer_pin;
 
 /*CONDITIONS*/
-bool potentiometer_is_set = false;
-bool is_radian = true;
+static bool potentiometer_is_set = false;
+static bool is_radian = true;
 
 /*CALIBRATION VALUES*/
-uint16_t potentiometer_zero_ref = 0;
-float voltage = 5.0;
-uint16_t resolution = 1024;
-float potentiometer_scale = (2 * PI * voltage * tachometer_sensitivity) / resolution;
+static uint16_t potentiometer_zero_ref = 0;
+static float voltage = 5.0;
+static uint16_t resolution = 1024;
+static float potentiometer_scale = (2 * PI * voltage * tachometer_sensitivity) / resolution;
 
 // FUNCTIONS DEFINITIONS
 
