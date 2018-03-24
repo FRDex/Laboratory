@@ -6,7 +6,7 @@ static uint8_t encoder_clockwise_pin = 0, encoder_counterclockwise_pin = 0;
 static bool pins_are_set = false
 static bool encoder_limit_is_set = false;
 static bool encoder_is_active = false;
-static bool Is_ClockWise = true;
+static volatile bool Is_ClockWise = true;
 
 /*POSITION RELATED VARIABLES*/
 static volatile int16_t encoder_position_counter = 0;
