@@ -30,10 +30,10 @@ bool potentiometer_is_radians(){
 }
 
 /*SETUP*/
-bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, bool radians, float voltage, uint16_t resolution){
-  this->potentiometer_pin = potentiometer_pin;
-  this->voltage = voltage;
-  this->resolution = resolution;
+bool potentiometer_set(uint8_t pin, bool set_zero_reference, bool radians, float max_voltage, uint16_t max_resolution){
+  potentiometer_pin = pin;
+  voltage = max_voltage;
+  resolution = max_resolution;
   pinMode(potentiometer_pin, INPUT);
   potentiometer_set_radians(radians);
   if(set_zero_reference){
@@ -43,8 +43,8 @@ bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference, bool 
   return potentiometer_is_set;
 }
 
-bool potentiometer_set(uint8_t potentiometer_pin, bool set_zero_reference){
-      return potentiometer_set(potentiometer_pin, set_zero_reference, true, 5.0, 1024);
+bool potentiometer_set(uint8_t pin, bool set_zero_reference){
+      return potentiometer_set(pin, set_zero_reference, true, 5.0, 1024);
 }
 
 bool potentiometer_set_zero_reference(){

@@ -31,11 +31,11 @@ bool tachometer_is_radians(){
 }
 
 /*SETUP*/
-bool tachometer_set(uint8_t tachometer_pin, bool set_zero_reference, bool radians, float voltage, uint16_t resolution, uint16_t tachometer_sensitivity){
-  this->tachometer_pin = tachometer_pin;
-  this->voltage = voltage;
-  this->resolution = resolution;
-  this->tachometer_sensitivity = tachometer_sensitivity;
+bool tachometer_set(uint8_t pin, bool set_zero_reference, bool radians, float max_voltage, uint16_t max_resolution, uint16_t sensitivity){
+  tachometer_pin = pin;
+  voltage = max_voltage;
+  resolution = max_resolution;
+  tachometer_sensitivity = sensitivity;
   pinMode(tachometer_pin, INPUT);
   tachometer_set_radians(radians);
   if(set_zero_reference){
