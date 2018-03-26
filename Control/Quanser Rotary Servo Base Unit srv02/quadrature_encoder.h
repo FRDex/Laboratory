@@ -3,6 +3,7 @@
 
 /*POSITION DATA RELATED*/
 float encoder_get_value();
+uint16_t encoder_get_counter_value();
 bool encoder_is_turning_clockwise();
 bool encoder_is_radians();
 

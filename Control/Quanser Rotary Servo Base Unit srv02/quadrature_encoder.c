@@ -31,6 +31,10 @@ float encoder_get_value(){
   return encoder_position_counter * encoder_scale;
 }
 
+uint16_t encoder_get_counter_value(){
+  return encoder_position_counter;
+}
+
 bool encoder_is_turning_clockwise(){
   return Is_ClockWise;
 }
