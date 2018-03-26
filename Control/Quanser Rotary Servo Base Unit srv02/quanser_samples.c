@@ -8,6 +8,7 @@ static volatile uint16_t *timer_reg_a, *timer_reg_b;
 static bool noise_canceler;
 static uint8_t prescaller = 1;
 static double timer_frequency = clock_frequency / prescaller;
+static double max_time_sample = 1;
 
 /*SAMPLE POINTS VARIABLES*/
 static uint16_t points = 1;
@@ -78,6 +79,19 @@ void set_sample_data(){
   motor_active_time = (motor_active_time > sampling_time) ? sampling_time, motor_active_time;
   Serial.println("Enter the total samples");
   while(!set_sample_points());
+
+  //CALCULATE BEST PRESCALLER FOR THE SAMPLING
+  time_between_samples = sampling_time / points;
+  double max_timer_value = max_timer_value / clock_frequency;
+  uint8_t prescaller_values[6] = [0,1,8,64,256,1024];
+  prescaller = prescaller_values[5];
+  for (uint8_t k = 1; k < 6 ; ++k) {
+    if ((max_timer_value * prescaller_values[k]) > time_between_samples){
+      prescaller = prescaller_values[k];
+      break;
+    }
+  }
+  set_prescaller_mask_value();
 
   timer_frequency = clock_frequency / prescaller;
   timer_value_between_samples = (sampling_time * timer_frequency) / points;
@@ -169,5 +183,14 @@ void set_prescaller_mask_value(){
       *timer_reg_b |= k;
     }
   }
+  max_time_sample = clock_frequency * (1 << 16) * prescaller;
   *timer = 0;
+}
+
+void set_sample_timer_1(double clock_frequency, uint8_t prescaller_value, bool active_noise_canceler){
+  set_sample_timer(clock_frequency, prescaller_value, &TCNT1, uint8_t &TIMSK1, uint8_t &OCR1A, uint8_t &OCR1B, active_noise_canceler);
+}
+
+void set_sample_timer_2(double clock_frequency, uint8_t prescaller_value, bool active_noise_canceler){
+  set_sample_timer(clock_frequency, prescaller_value, &TCNT2, uint8_t &TIMSK2, uint8_t &OCR2A, uint8_t &OCR2B, active_noise_canceler);
 }
