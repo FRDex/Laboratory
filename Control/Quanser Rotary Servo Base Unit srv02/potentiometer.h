@@ -2,7 +2,7 @@
 #define __POTENTIOMETER_H_INCLUDED__
 
 /*POTENTIOMETER VALUE*/
-uint16_t potentiometer_get_value();  // VALUE MIGHT BE IN RADIANS/DEGREES DEPENDING ON CONFIG (DEFAULT: RADIANS)
+float potentiometer_get_value();  // VALUE MIGHT BE IN RADIANS/DEGREES DEPENDING ON CONFIG (DEFAULT: RADIANS)
 bool potentiometer_is_radians();
 
 /*SETUP*/

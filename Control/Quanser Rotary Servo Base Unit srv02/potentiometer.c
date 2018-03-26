@@ -21,7 +21,7 @@ static float potentiometer_scale = (2 * PI * voltage) / resolution;
 // FUNCTIONS DEFINITIONS
 
 /*POTENTIOMETER VALUE*/
-uint16_t potentiometer_get_value(){
+float potentiometer_get_value(){
   return (analogRead(potentiometer_pin) - potentiometer_zero_ref) * potentiometer_scale;
 }
 

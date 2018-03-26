@@ -2,7 +2,7 @@
 #define __TACHOMETER_H_INCLUDED__
 
 /*TACHOMETER VALUE*/
-uint16_t tachometer_get_value();  // VALUE MIGHT BE IN RADIANS/DEGREES DEPENDING ON CONFIG (DEFAULT: RADIANS)
+float tachometer_get_value();  // VALUE MIGHT BE IN RADIANS/DEGREES DEPENDING ON CONFIG (DEFAULT: RADIANS)
 bool tachometer_is_radians();
 /*SETUP */
 bool tachometer_set(uint8_t pin, bool set_zero_reference, bool radians, float max_voltage, uint16_t max_resolution, uint16_t sensitivity);

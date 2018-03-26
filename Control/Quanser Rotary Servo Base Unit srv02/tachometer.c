@@ -22,7 +22,7 @@ static float tachometer_scale = (2 * PI * voltage * tachometer_sensitivity) / (6
 // FUNCTIONS DEFINITIONS
 
 /*TACHOMETER VALUE*/
-uint16_t tachometer_get_value(){
+float tachometer_get_value(){
   return (analogRead(tachometer_pin) - tachometer_zero_ref) * tachometer_scale;
 }
 
