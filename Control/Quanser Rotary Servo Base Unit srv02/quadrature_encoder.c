@@ -40,16 +40,17 @@ bool encoder_is_turning_clockwise(){
 }
 
 /*SETUP*/
-bool encoder_set(uint8_t clockwise_pin, uint8_t counterclockwise_pin, uint16_t max_value){
+bool encoder_set(uint8_t clockwise_pin, uint8_t counterclockwise_pin, bool radians, uint16_t max_value){
   if(encoder_set_limit(max_value)){
     encoder_deactivate();
+    encoder_set_radians(radians);
     return encoder_set_pins(clockwise_pin,counterclockwise_pin);
   }
   return false;
 }
 
 bool encoder_set(uint8_t clockwise_pin, uint8_t counterclockwise_pin){
-  return encoder_set(clockwise_pin, counterclockwise_pin, 4096);
+  return encoder_set(clockwise_pin, counterclockwise_pin, true, 4096);
 }
 
 bool encoder_set_limit(uint16_t max_value){
