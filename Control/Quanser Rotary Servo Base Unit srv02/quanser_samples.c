@@ -160,7 +160,7 @@ uint16_t time_to_position(uint16_t initial_time){
 }
 
 /*SET TIMER*/
-void set_sample_timer(double clock_frequency, uint8_t prescaller_value, uint16_t &timer_ref,uint16_t &OCRA_ref, uint8_t &TIMSK_ref,uint8_t &timer_reg_a_ref, uint8_t &timer_reg_b_ref, bool active_noise_canceler){
+bool set_sample_timer(double clock_frequency, uint8_t prescaller_value, uint16_t &timer_ref,uint16_t &OCRA_ref, uint8_t &TIMSK_ref,uint8_t &timer_reg_a_ref, uint8_t &timer_reg_b_ref, bool active_noise_canceler){
   clock_frequency = clock_frequency;
   prescaller = prescaller_value;
   timer = &timer_ref;
@@ -169,10 +169,11 @@ void set_sample_timer(double clock_frequency, uint8_t prescaller_value, uint16_t
   timer_reg_a = &timer_reg_a_ref;
   timer_reg_b = &timer_reg_b_ref;
   noise_canceler = active_noise_canceler;
-  set_prescaller_mask_value();
+  return set_prescaller_mask_value();
 }
 
-void set_prescaller_mask_value(){
+bool set_prescaller_mask_value(){
+  bool setup = false;
   *TIMSK = 0;
   *timer_reg_a = 0;
   *OCRA = (uint16_t)(-1);
@@ -181,10 +182,12 @@ void set_prescaller_mask_value(){
   for (uint8_t k = 0; k < 6; ++k){
     if (prescaller == prescaller_value[k]){
       *timer_reg_b |= k;
+       setup = true;
     }
   }
   max_time_sample = clock_frequency * (1 << 16) * prescaller;
   *timer = 0;
+  return setup;
 }
 
 void set_sample_timer_1(double clock_frequency, uint8_t prescaller_value, bool active_noise_canceler){
