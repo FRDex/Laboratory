@@ -11,6 +11,7 @@ static volatile bool Is_ClockWise = true;
 /*POSITION RELATED VARIABLES*/
 static volatile int16_t encoder_position_counter = 0;
 static int16_t encoder_positive_limit = 4096, encoder_negative_limit = -4096;
+static float encoder_scale = (2 * PI) / encoder_positive_limit;
 
 
 // FUNCTIONS HEADERS
@@ -26,8 +27,8 @@ bool encoder_set_limit(int16_t max_value);  // ENCODER MAX ABSOLUTE VALUE
 
 // FUNCTIONS DEFINITIONS
 /*ENCODER VALUES*/
-inline int16_t encoder_get_value(){
-  return encoder_position_counter;
+float encoder_get_value(){
+  return encoder_position_counter * encoder_scale;
 }
 
 bool encoder_is_turning_clockwise(){
@@ -69,8 +70,8 @@ bool encoder_set_pins(uint8_t clockwise_pin, uint8_t counterclockwise_pin){
   return false;
 }
 
-bool encoder_set_reference_value(int16_t value){
-  encoder_position_counter = value % encoder_positive_limit;
+bool encoder_set_reference_value(float value){
+  encoder_position_counter = (value / encoder_scale) % encoder_positive_limit;
   return true;
 }
 
@@ -122,4 +123,15 @@ inline void encoder_counter_module(){
     encoder_position_counter += QUANSER_ENCODER_MAX_MARKS_MEASURES;
     }
   }
+}
+
+bool encoder_set_radians(bool radians){
+    is_radian = radians;
+    if(is_radian){
+        encoder_scale = (2 * PI) / encoder_positive_limit;
+    }
+    else{
+        encoder_scale = 360 / encoder_positive_limit;
+    }
+    return is_radian;
 }
