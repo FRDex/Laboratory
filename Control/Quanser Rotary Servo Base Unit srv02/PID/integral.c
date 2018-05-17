@@ -22,9 +22,9 @@ float integral_get_value(){
 //THIS METHOD IS FOR INTEGRAL OF THE LAST N ELEMENTS
 float integral_new_value(float value, float sample_separation){
   if(is_integral_set){
-    integral_value -= integral[differential_value][actual_index];
-    integral[value][k] = value;
-    integral[differential_value][k] = ((integral[value][actual_index] + integral[value][previous_index]) * sample_separation) / 2;
+    integral_value -= integral[differential_value][actual_index];  // SUBSTRACT THE LAST SAMPLE THAT WILL BE OVERWRITE
+    integral[value][actual_index] = value;
+    integral[differential_value][actual_index] = ((integral[value][actual_index] + integral[value][previous_index]) * sample_separation) / 2;
     integral_value += integral[differential_value][actual_index];
     increase_indexes();
   }
@@ -32,20 +32,20 @@ float integral_new_value(float value, float sample_separation){
 }
 
 /*INTEGRAL SETUP*/
-bool integral_setup(uint8_t points, float integral[2][]){
+bool integral_setup(uint8_t integral_points, float integral[2][]){
   is_integral_set = false;
-  if(points > 1){
-    is_integral_set = integral_clear(points, integral);
+  if(integral_points > 1){
+    is_integral_set = integral_clear(integral_points, integral);
   }
 	return is_integral_set;
 }
 
-bool integral_clear(uint8_t points, float integral[2][]){
-  n_integral_points = points;
+bool integral_clear(uint8_t integral_points, float integral[2][]){
+  n_integral_integral_points = integral_points;
   actual_index = 1;
   previous_index = 0;
   integral_value = 0.0;
-  for(uint8_t k = 0; k < points; ++k){
+  for(uint8_t k = 0; k < integral_points; ++k){
     integral[value][k] = 0;
     integral[differential_value][k] = 0;
   }
