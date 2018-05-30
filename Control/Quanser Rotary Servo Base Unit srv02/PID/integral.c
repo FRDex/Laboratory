@@ -13,9 +13,9 @@ float integral_get_value(integral_struct &integral_structure){
 //THIS METHOD IS FOR INTEGRAL OF THE LAST N ELEMENTS
 float integral_new_value(float value, float sample_separation, integral_struct &integral_structure){
   if(is_integral_set){
-    integral_structure.integral_sum -= integral_structure.integral_differential_value[integral_structure.actual_index];  // SUBSTRACT THE LAST SAMPLE THAT WILL BE OVERWRITE
-    integral_structure.integral_differential_value[integral_structure.actual_index] = (value + integral_structure.previous_value) * sample_separation) / 2;
-    integral_structure.integral_sum += integral_structure.integral_differential_value[integral_structure.actual_index];
+    integral_structure.integral_sum -= integral_structure.integral_differential_value[integral_structure.index];  // SUBSTRACT THE LAST SAMPLE THAT WILL BE OVERWRITE
+    integral_structure.integral_differential_value[integral_structure.index] = (value + integral_structure.previous_value) * sample_separation) / 2;
+    integral_structure.integral_sum += integral_structure.integral_differential_value[integral_structure.index];
     integral_structure.previous_value = value;
     increase_indexes(integral_structure);
   }
@@ -34,8 +34,7 @@ bool integral_setup(uint8_t integral_points, integral_struct &integral_structure
 
 bool integral_clear(integral_struct &integral_structure){
   // INTEGRAL PARAMETERS
-  integral_structure.actual_index = 1;
-  integral_structure.previous_index = 0;
+  integral_structure.index = 1;
   integral_structure.previous_value = 0.0;
   integral_structure.integral_sum = 0.0;
   integral_structure.integral_differential_value = float[integral_structure.integral_points]; // NEED REFERENCE &?
@@ -47,9 +46,8 @@ bool integral_clear(integral_struct &integral_structure){
 }
 
 void increase_indexes(integral_struct &integral_structure){
-  integral_structure.previous_index = integral_structure.actual_index;
-  ++integral_structure.actual_index;
-  if(integral_structure.actual_index >= integral_structure.integral_points){
-    integral_structure.actual_index = 0;
+  ++integral_structure.index;
+  if(integral_structure.index >= integral_structure.integral_points){
+    integral_structure.index = 0;
   }
 }

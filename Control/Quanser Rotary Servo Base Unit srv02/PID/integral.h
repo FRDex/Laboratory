@@ -5,8 +5,8 @@
 typedef struct {
   bool is_integral_set;
   /*ARRAY STRUCTURE INFO*/
-  uint8_t actual_index, previous_index, n_integral_points;
-  float & integral_differential_value;
+  uint8_t index, n_integral_points;
+  float & integral_differential_value[];
   /*INTEGRAL VARIABLES*/
   float integral_sum;
   float previous_value;
