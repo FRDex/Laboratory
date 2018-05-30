@@ -1,61 +1,55 @@
 #include <integral.h>
-/*CONDITIONALS*/
-static bool is_integral_set = false;
-/*ARRAY STRUCTURE INFO*/
-static enum {sample_value = 0, differential_value = 1}
-static uint8_t actual_index;
-static uint8_t previous_index;
-/*INTEGRAL VARIABLES*/
-static uint8_t n_integral_points;
-static float integral_value = 0.0;
 
 /*FUNCTION DECLARATION*/
-void increase_indexes();
+void increase_indexes(integral_struct &integral_structure);
 
 /*INTEGRAL FUNCTIONS*/
-float integral_get_value(){
-  return integral_value;
+float integral_get_value(integral_struct &integral_structure){
+  return integral_structure.integral_sum;
 }
 
 //THE COMPOSITE NUMERICAL INTEGRATION METHOD IS IMPLEMENT TO APROXIMATE THE INTEGRAL
 //IT CAN BE DEMONSTRATED THAT THE COMPOSITE NUMERICAL INTEGRATION IS EQUIVALENT TO TRAPEZOIDAL INTEGRATION METHOD
 //THIS METHOD IS FOR INTEGRAL OF THE LAST N ELEMENTS
-float integral_new_value(float value, float sample_separation){
+float integral_new_value(float value, float sample_separation, integral_struct &integral_structure){
   if(is_integral_set){
-    integral_value -= integral[differential_value][actual_index];  // SUBSTRACT THE LAST SAMPLE THAT WILL BE OVERWRITE
-    integral[value][actual_index] = value;
-    integral[differential_value][actual_index] = ((integral[value][actual_index] + integral[value][previous_index]) * sample_separation) / 2;
-    integral_value += integral[differential_value][actual_index];
-    increase_indexes();
+    integral_structure.integral_sum -= integral_structure.integral_differential_value[integral_structure.actual_index];  // SUBSTRACT THE LAST SAMPLE THAT WILL BE OVERWRITE
+    integral_structure.integral_differential_value[integral_structure.actual_index] = (value + integral_structure.previous_value) * sample_separation) / 2;
+    integral_structure.integral_sum += integral_structure.integral_differential_value[integral_structure.actual_index];
+    integral_structure.previous_value = value;
+    increase_indexes(integral_structure);
   }
-  return integral_value;
+  return integral_sum;
 }
 
 /*INTEGRAL SETUP*/
-bool integral_setup(uint8_t integral_points, float integral[2][]){
-  is_integral_set = false;
+bool integral_setup(uint8_t integral_points, integral_struct &integral_structure){
+  bool is_integral_set = false;
   if(integral_points > 1){
-    is_integral_set = integral_clear(integral_points, integral);
+    integral_structure.n_integral_points = integral_points;
+    is_integral_set = integral_clear(integral_struct &integral_structure);
   }
-	return is_integral_set;
+  return is_integral_set;
 }
 
-bool integral_clear(uint8_t integral_points, float integral[2][]){
-  n_integral_integral_points = integral_points;
-  actual_index = 1;
-  previous_index = 0;
-  integral_value = 0.0;
-  for(uint8_t k = 0; k < integral_points; ++k){
-    integral[value][k] = 0;
-    integral[differential_value][k] = 0;
+bool integral_clear(integral_struct &integral_structure){
+  // INTEGRAL PARAMETERS
+  integral_structure.actual_index = 1;
+  integral_structure.previous_index = 0;
+  integral_structure.previous_value = 0.0;
+  integral_structure.integral_sum = 0.0;
+  integral_structure.integral_differential_value = float[integral_structure.n_integral_points]; // NEED REFERENCE &?
+  for(uint8_t k = 0; k < integral_structure.n_integral_points; ++k){
+     integral_structure.integral_differential_value[k] = 0;
   }
+  integral_structure.is_integral_set = true;
   return true;
 }
 
-void increase_indexes(){
-  previous_index = actual_index;
-  ++actual_index;
-  if(actual_index >= n_integral_points){
-    actual_index = 0;
+void increase_indexes(integral_struct &integral_structure){
+  integral_structure.previous_index = integral_structure.actual_index;
+  ++integral_structure.actual_index;
+  if(integral_structure.actual_index >= integral_structure.n_integral_points){
+    integral_structure.actual_index = 0;
   }
 }
