@@ -11,11 +11,9 @@ typedef struct {
   bool is_differential_set;
   /*DIFFERENTIATION VARIABLES*/
   uint8_t differential_degree, differential_points;
-  float previous_value;
-  float derivative;
   /*ARRAY STRUCTURE INFO*/
-  float differential_values[DIFFERENTIATION_MAX_POINTS];
-  float differential_separation[DIFFERENTIATION_MAX_POINTS];
+  float actual_taylor_elements[DIFFERENTIATION_MAX_POINTS];
+  float previous_taylor_elements[DIFFERENTIATION_MAX_POINTS];
 } differentiation_struct;
 
 /*INTEGRAL VALUE*/
