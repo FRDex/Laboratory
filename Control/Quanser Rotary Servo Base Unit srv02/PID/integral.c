@@ -26,7 +26,7 @@ float integral_new_value(float value, float sample_separation, integral_struct &
 bool integral_setup(uint8_t integral_points, integral_struct &integral_structure){
   bool is_integral_set = false;
   if(integral_points > 1){
-    integral_structure.n_integral_points = integral_points;
+    integral_structure.integral_points = integral_points;
     is_integral_set = integral_clear(integral_struct &integral_structure);
   }
   return is_integral_set;
@@ -38,8 +38,8 @@ bool integral_clear(integral_struct &integral_structure){
   integral_structure.previous_index = 0;
   integral_structure.previous_value = 0.0;
   integral_structure.integral_sum = 0.0;
-  integral_structure.integral_differential_value = float[integral_structure.n_integral_points]; // NEED REFERENCE &?
-  for(uint8_t k = 0; k < integral_structure.n_integral_points; ++k){
+  integral_structure.integral_differential_value = float[integral_structure.integral_points]; // NEED REFERENCE &?
+  for(uint8_t k = 0; k < integral_structure.integral_points; ++k){
      integral_structure.integral_differential_value[k] = 0;
   }
   integral_structure.is_integral_set = true;
@@ -49,7 +49,7 @@ bool integral_clear(integral_struct &integral_structure){
 void increase_indexes(integral_struct &integral_structure){
   integral_structure.previous_index = integral_structure.actual_index;
   ++integral_structure.actual_index;
-  if(integral_structure.actual_index >= integral_structure.n_integral_points){
+  if(integral_structure.actual_index >= integral_structure.integral_points){
     integral_structure.actual_index = 0;
   }
 }

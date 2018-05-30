@@ -3,7 +3,7 @@
 
 /*INTEGRAL STRUCT*/
 typedef struct {
-  bool is_integral_set = false;
+  bool is_integral_set;
   /*ARRAY STRUCTURE INFO*/
   uint8_t actual_index, previous_index, n_integral_points;
   float & integral_differential_value;
