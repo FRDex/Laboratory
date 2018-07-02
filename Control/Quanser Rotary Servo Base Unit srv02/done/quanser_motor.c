@@ -1,9 +1,9 @@
-#include <quanser_motor.h>
+#include "quanser_motor.h"
 /*HARDWARE INPUT*/
-uint8_t motor_clockwise_pin, motor_counterclockwise_pin;
+static uint8_t motor_clockwise_pin, motor_counterclockwise_pin;
 
 /*CONDITIONS*/
-bool motor_is_set = false;
+static bool motor_is_set = false;
 
 // FUNCTIONS DEFINITIONS
 

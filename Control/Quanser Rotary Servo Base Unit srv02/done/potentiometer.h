@@ -1,5 +1,12 @@
 #ifndef __POTENTIOMETER_H_INCLUDED__
 #define __POTENTIOMETER_H_INCLUDED__
+//EXTERNAL LIBRARIES
+#include <Arduino.h>
+
+// REFERENCES
+#ifndef PI
+#define PI (float)(3.14159265358979)
+#endif
 
 /*POTENTIOMETER VALUE*/
 float potentiometer_get_value();  // VALUE MIGHT BE IN RADIANS/DEGREES DEPENDING ON CONFIG (DEFAULT: RADIANS)

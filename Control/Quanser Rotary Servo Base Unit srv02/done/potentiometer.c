@@ -1,9 +1,4 @@
-#include <potentiometer.h>
-// REFERENCES
-#ifndef __PI_DEFINED__
-  #define __PI_DEFINED__
-  #define PI (float)(3.14159265358979)
-#endif
+#include "potentiometer.h"
 
 /*HARDWARE INPUT*/
 static uint8_t potentiometer_pin;

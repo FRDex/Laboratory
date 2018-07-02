@@ -1,5 +1,12 @@
 #ifndef __QUADRATURE_ENCODER_H_INCLUDED__
 #define __QUADRATURE_ENCODER_H_INCLUDED__
+//EXTERNAL LIBRARIES
+#include <Arduino.h>
+
+// REFERENCES
+#ifndef PI
+#define PI (float)(3.14159265358979)
+#endif
 
 /*POSITION DATA RELATED*/
 float encoder_get_value();

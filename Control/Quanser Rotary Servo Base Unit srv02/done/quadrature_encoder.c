@@ -1,4 +1,4 @@
-#include <quadrature_encoder.h>
+#include "quadrature_encoder.h"
 /*HARDWARE INPUT*/
 static uint8_t encoder_clockwise_pin = 0, encoder_counterclockwise_pin = 0;
 

@@ -1,8 +1,11 @@
 #ifndef __QUANSER_MOTOR_H_INCLUDED__
 #define __QUANSER_MOTOR_H_INCLUDED__
+//EXTERNAL LIBRARIES
+#include <Arduino.h>
 
 /*MOVE MOTORS*/
 bool motor_move(bool move_clockwise);
+
 /*STOP MOTORS*/
 bool motors_stop();
 

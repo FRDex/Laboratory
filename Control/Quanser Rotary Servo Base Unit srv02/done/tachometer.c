@@ -1,9 +1,4 @@
-#include <tachometer.h>
-// REFERENCES
-#ifndef __PI_DEFINED__
-  #define __PI_DEFINED__
-  #define PI (float)(3.14159265358979)
-#endif
+#include "tachometer.h"
 
 /*HARDWARE INPUT*/
 static uint8_t tachometer_pin;
