@@ -82,6 +82,7 @@ bool infrared_is_data_ready(){
 }
 
 uint16_t infrared_read_data(){
+  received_data_waiting_to_be_processed = false;
   return received_value;
 }
 
