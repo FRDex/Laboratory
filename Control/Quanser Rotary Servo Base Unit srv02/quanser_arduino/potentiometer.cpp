@@ -9,15 +9,16 @@ static bool is_radian = true;
 
 /*CALIBRATION VALUES*/
 static uint16_t potentiometer_zero_ref = 0;
-static float voltage = 5.0;
-static uint16_t resolution = 1024;
-static float potentiometer_scale = (2 * PI * voltage) / resolution;
+static uint16_t resolution = 1023;
+
+
+static float potentiometer_scale = PI / ((float)(potenciometer_positive_90_degrees_value - potenciometer_negative_90_degrees_value));
 
 // FUNCTIONS DEFINITIONS
 
 /*POTENTIOMETER VALUE*/
-float potentiometer_get_value(){
-  return (analogRead(potentiometer_pin) - potentiometer_zero_ref) * potentiometer_scale;
+float potentiometer_get_angle(){
+  return ((int16_t)(analogRead(potentiometer_pin)) - (int16_t)(potentiometer_zero_ref)) * potentiometer_scale;
 }
 
 bool potentiometer_is_radians(){
@@ -25,14 +26,16 @@ bool potentiometer_is_radians(){
 }
 
 /*SETUP*/
-bool potentiometer_set(uint8_t pin, bool set_zero_reference, bool radians, float max_voltage, uint16_t max_resolution){
+bool potentiometer_set(uint8_t pin, bool set_zero_reference, uint16_t value, bool radians, uint16_t max_resolution){
   potentiometer_pin = pin;
-  voltage = max_voltage;
-  resolution = max_resolution;
   pinMode(potentiometer_pin, INPUT);
+  resolution = max_resolution;
   potentiometer_set_radians(radians);
   if(set_zero_reference){
     potentiometer_set_actual_position_to_zero_reference();
+  }
+  else{
+    potentiometer_set_zero_reference_value(value);
   }
   potentiometer_is_set = true;
   return potentiometer_is_set;
@@ -43,7 +46,7 @@ bool potentiometer_set_actual_position_to_zero_reference(){
   return true;
 }
 
-bool potentiometer_set_zero_reference(uint16_t value){
+bool potentiometer_set_zero_reference_value(uint16_t value){
   potentiometer_zero_ref = value;
   return true;
 }
@@ -51,10 +54,10 @@ bool potentiometer_set_zero_reference(uint16_t value){
 bool potentiometer_set_radians(bool radians){
     is_radian = radians;
     if(is_radian){
-        potentiometer_scale = (2 * PI * voltage) / resolution;
+        potentiometer_scale = PI / ((float)(potenciometer_positive_90_degrees_value - potenciometer_negative_90_degrees_value));
     }
     else{
-        potentiometer_scale = (360 * voltage) / resolution;
+        potentiometer_scale = 180.0  / ((float)(potenciometer_positive_90_degrees_value - potenciometer_negative_90_degrees_value));
     }
     return is_radian;
 }

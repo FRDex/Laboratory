@@ -6,10 +6,9 @@
 #include "quadrature_encoder.h"
 
 /*SAMPLES*/
-void set_sample_data();
-void get_quanser_samples();
+void generate_quanser_samples();
 
 /*TIMER SETUP*/
-bool set_sample_timer(double clock_frequency, uint8_t prescaller_value, uint16_t &timer_ref,uint16_t &OCRA_ref, uint8_t &TIMSK_ref,uint8_t &timer_reg_a_ref, uint8_t &timer_reg_b_ref, bool active_noise_canceler);
+bool setup_quanser_samples(bool active_noise_canceler = false, uint16_t prescaller_value = 1, float desired_time_between_samples_in_microseconds = 1000);
 
 #endif

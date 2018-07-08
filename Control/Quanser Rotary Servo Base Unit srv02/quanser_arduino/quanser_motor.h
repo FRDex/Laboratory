@@ -4,8 +4,10 @@
 // #include <Stdint.h>
 #include <Arduino.h>
 
+#define clockwise true
+#define counterclockwise false
 /*MOVE MOTORS*/
-bool motor_move(bool move_clockwise);
+bool motor_move(bool move_clockwise, uint8_t power);
 
 /*STOP MOTORS*/
 bool motors_stop();

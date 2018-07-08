@@ -8,22 +8,22 @@ static bool motor_is_set = false;
 // FUNCTIONS DEFINITIONS
 
 //HEADER
-bool motor_move(uint8_t active_motor, uint8_t pasive_motor);
+bool motor_move(uint8_t active_motor, uint8_t pasive_motor, uint8_t power);
 
 /*MOTOR MOVE*/
-bool motor_move(bool move_clockwise){
+bool motor_move(bool move_clockwise, uint8_t power){
     if (move_clockwise){
-      motor_move(motor_clockwise_pin, motor_counterclockwise_pin);
+      motor_move(motor_clockwise_pin, motor_counterclockwise_pin, power);
     }
     else{
-      motor_move(motor_counterclockwise_pin, motor_clockwise_pin);
+      motor_move(motor_counterclockwise_pin, motor_clockwise_pin, power);
     }
 }
 
-bool motor_move(uint8_t active_motor, uint8_t pasive_motor){
+bool motor_move(uint8_t active_motor, uint8_t pasive_motor, uint8_t power){
   if (motor_is_set) {
-    digitalWrite(pasive_motor, LOW);
-    digitalWrite(active_motor, HIGH);
+    analogWrite(pasive_motor, 0);
+    analogWrite(active_motor, power);
     return true;
   }
   return false;
@@ -32,8 +32,8 @@ bool motor_move(uint8_t active_motor, uint8_t pasive_motor){
 /*MOTOR MOVE*/
 bool motors_stop(){
   if (motor_is_set) {
-    digitalWrite(motor_clockwise_pin, LOW);
-    digitalWrite(motor_counterclockwise_pin, LOW);
+    analogWrite(motor_clockwise_pin, 0);
+    analogWrite(motor_counterclockwise_pin, 0);
   }
   return true;
 }

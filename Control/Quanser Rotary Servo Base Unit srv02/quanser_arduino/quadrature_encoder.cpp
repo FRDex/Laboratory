@@ -28,11 +28,11 @@ bool encoder_set_limit(uint16_t max_value);  // ENCODER MAX ABSOLUTE VALUE
 
 // FUNCTIONS DEFINITIONS
 /*ENCODER VALUES*/
-float encoder_get_value(){
+float encoder_get_angle(){
   return encoder_position_counter * encoder_scale;
 }
 
-uint16_t encoder_get_counter_value(){
+int16_t encoder_get_counter_value(){
   return encoder_position_counter;
 }
 
@@ -141,4 +141,3 @@ bool encoder_set_radians(bool radians){
 bool encoder_is_radians(){
     return is_radian;
 }
-
