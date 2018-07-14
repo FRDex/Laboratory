@@ -15,9 +15,10 @@ bool encoder_is_turning_clockwise();
 bool encoder_is_radians();
 
 /*ENCODER SETUP*/
-bool encoder_set(uint8_t clockwise_pin, uint8_t counterclockwise_pin, bool radians = true, uint16_t max_value = 4096);
+bool encoder_set(uint8_t clockwise_pin, uint8_t counterclockwise_pin, bool radians = true, uint16_t max_value = 2048);
 bool encoder_set_actual_position_to_zero_reference();  // SET THE ACTUAL MOTOR POSITION AS THE ZERO REFERENCE FOR THE ENCODER
 bool encoder_set_reference_value(float value); // SET AN OFFSET FROM THE ACTUAL MOTOR POSITION AS THE ZERO REFERENCE FOR THE ENCODER
+bool encoder_set_reference_count_value(int16_t value); // SET AN OFFSET FROM THE ACTUAL MOTOR POSITION AS THE ZERO REFERENCE FOR THE ENCODER (IN COUNTER SCALE)
 bool encoder_activate();  // SET PINS AS INPUTS AND ATTACH INTTERUPTS. (MUST SET ENCODER FIRST)
 bool encoder_deactivate();  // DETACH INTERRUPTS
 bool encoder_set_radians(bool radians = true);

@@ -9,6 +9,6 @@
 void generate_quanser_samples();
 
 /*TIMER SETUP*/
-bool setup_quanser_samples(bool active_noise_canceler = false, uint16_t prescaller_value = 1, float desired_time_between_samples_in_microseconds = 2000);
+bool setup_quanser_samples(bool active_noise_canceler = false, uint16_t prescaller_value = 64, float desired_time_between_samples_in_microseconds = 500);
 
 #endif

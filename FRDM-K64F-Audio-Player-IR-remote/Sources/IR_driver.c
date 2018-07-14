@@ -1,4 +1,11 @@
-#include "driver_ir.h"
+/*
+ * IR_driver.c
+ *
+ *  Created on: 4/7/2018
+ *      Author: tomh6
+ */
+
+#include "IR_driver.h"
 #include <stdbool.h> //typedef enum { false, true } bool;
 /*
 * THE CODE IMPLEMENT RC-5 PHILIPS PROTOCOL (MANCHESTER CODED)
@@ -55,9 +62,13 @@
 // PERIOD 1/50MHz
 // TIME VALUE WITH PRESCALLER = needed_time / (PRESCALLER x PERIOD) = FRECUENCY x needed_time / PRESCALLER
 
-
-static const uint16_t maximum_time_separation = 2.5 * 889 * 50  / infrared_prescaller; //GLITCH THRESHOLD (2.5 x 889us) => 2.5 * 889us * 50MHz / prescaller
-static const uint16_t threshold_separation = 1.5 * 889 * 50  / infrared_prescaller; //THRESHOLD SEPARATION (1.5 x 889 uS) => 1.5 * 889us * 50MHz / prescaller
+static const uint8_t infrared_port = 9;
+static const uint8_t infrared_prescaller = 128; // POWER OF TWO FROM 1 to 128
+//static const uint16_t maximum_time_separation = 2.5 * 889 * 50  / infrared_prescaller; //GLITCH THRESHOLD (2.5 x 889us) => 2.5 * 889us * 50MHz / prescaller
+//static const uint16_t threshold_separation = 1.5 * 889 * 50  / infrared_prescaller; //THRESHOLD SEPARATION (1.5 x 889 uS) => 1.5 * 889us * 50MHz / prescaller
+uint16_t maximum_time_separation = 868;
+uint16_t threshold_separation = 521;
+uint16_t minimum_time_separation = 174;
 
 // SYMBOLS
 static const uint8_t ir_total_symbols_transmitted = 14;
@@ -72,7 +83,7 @@ static bool setup_finished = false;
 
 
 // LOCAL HEADERS
-static void save_data(uint16_t transmission_data);
+static bool save_data(uint16_t transmission_data);
 static inline uint16_t get_time_separation();
 static inline uint16_t read_time();
 
@@ -87,12 +98,13 @@ uint16_t infrared_read_data(){
 }
 
 void infrared_interrupt(){
-  static uint16_t time_separation;
+  FTM_ClearInterruptFlag (FTM3, FTM_CH_5);
+  //static uint16_t time_separation;
   // SECURITY CHECK
-  if (!setup_finished){
+/*  if (!setup_finished){
     std::cout << "Infrared hasn't been properly initialized. Please check setup." << std::endl;
     return;
-  }
+  }*/
 
   // SYMBOL
   static bool symbol_value = false;  //TRUE = 1, FALSE = 0
@@ -102,7 +114,18 @@ void infrared_interrupt(){
   // NUMBER OF SYMBOL RECEIVED
   static uint8_t number_of_symbols_received = 0;
   // TIME
-  time_separation = get_time_separation();
+  uint16_t time_separation = get_time_separation();
+
+
+// ERROR CASES
+  if ((time_separation < minimum_time_separation) || (time_separation < maximum_time_separation && number_of_symbols_received == 0)){
+  // RESTART
+	symbol_value = false;
+	is_symbol_received = false;
+	transmission_data = 0;
+	number_of_symbols_received = 0;
+	return;
+  }
 
 
   if (time_separation > maximum_time_separation){  // IS A STARTING SEQUENCE / NEED TO RESTART
@@ -116,7 +139,7 @@ void infrared_interrupt(){
     is_symbol_received = true;  // SEE RECEIVED CONDITION AT HEADER
   }
   else{
-    is_symbol_received != true;  // SEE RECEIVED CONDITION AT HEADER, NEED TO WAIT FOR TWO CALLS
+    is_symbol_received = is_symbol_received != true;  // SEE RECEIVED CONDITION AT HEADER, NEED TO WAIT FOR TWO CALLS
   }
 
   // SAVE SYMBOL IF NEEDED IN transmission_data
@@ -127,7 +150,7 @@ void infrared_interrupt(){
   }
 
   // SAVE RESULT IF NEEDED (WHEN transmission_data is complete)
-  if (number_of_symbols_received == ir_total_symbols_transmitted){
+  if (number_of_symbols_received >= ir_total_symbols_transmitted){
     save_data(transmission_data); // SAVE IT IN BUFFER
     // RESTART
     symbol_value = false;
@@ -138,9 +161,10 @@ void infrared_interrupt(){
 
 }
 
-
+//uint16_t value_template = (1 << (ir_total_symbols_transmitted - ir_start_symbols)) - 1 ; // REPRESENT ALL 11 VALUES OF THE transmission_data
+static uint16_t value_template = 2047;
 static bool save_data(uint16_t transmission_data){
-  static const uint16_t value_template = (1 << (ir_total_symbols_transmitted - ir_start_symbols)) - 1 ; // REPRESENT ALL 11 VALUES OF THE transmission_data
+
   static uint16_t previous_transmission_data = 0;
 
   if (transmission_data == previous_transmission_data){ //USE THE HEADER (TOGGLE BIT) & VALUE, TO SEE IF THERE IS A NEW KEY OR IS THE SAME KEY BEING PRESSED
@@ -152,6 +176,7 @@ static bool save_data(uint16_t transmission_data){
   received_data_waiting_to_be_processed = true;
   return true;
 }
+
 
 
 static inline uint16_t get_time_separation(){
@@ -178,13 +203,22 @@ bool infrared_setup(){
   PORT_Configure2 (PORTC, infrared_port, UserPCR);
 
   // CLOCK
-  FTM_SetPrescaler(FTM3, infrared_prescaller);	  /// BusClock=sysclk/2= 50MHz y presccaler = divx128
+  FTM_SetPrescaler(FTM3, FTM_PSC_x128);	  /// BusClock=sysclk/2= 50MHz y presccaler = divx128
   FTM3->CNTIN = 0x0000;				  		  /// Free running
   FTM3->MOD = 0xFFFF;
   FTM_SetWorkingMode(FTM3, FTM_CH_5, FTM_mInputCapture);   // OC Function and toggle output
   FTM_SetInputCaptureEdge (FTM3, FTM_CH_5, FTM_eEither);  // both edges
   FTM_SetInterruptMode (FTM3, FTM_CH_5, true); // enable interrups
   FTM_StartClock(FTM3); //Select BusClk
+  FTM_ClearInterruptFlag (FTM3, FTM_CH_5);
 
   setup_finished = true;
 }
+
+
+
+
+
+
+
+

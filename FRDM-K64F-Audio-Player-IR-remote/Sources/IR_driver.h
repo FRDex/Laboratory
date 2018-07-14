@@ -1,5 +1,13 @@
-#ifndef __DRIVER_IR_H_INCLUDED__
-#define __DRIVER_IR_H_INCLUDED__
+/*
+ * IR_driver.h
+ *
+ *  Created on: 3/7/2018
+ *      Author: tomh6
+ */
+
+#ifndef SOURCES_IR_DRIVER_H_
+#define SOURCES_IR_DRIVER_H_
+
 //EXTERNAL LIBRARIES
 #include "Template/LDM.h"
 #include "PORT.h"
@@ -14,8 +22,9 @@ uint16_t infrared_read_data();
 void infrared_interrupt();
 
 /*SETUP*/
-const uint8_t infrared_port = 9;
-const uint8_t infrared_prescaller = 128; // POWER OF TWO FROM 1 to 128
 bool infrared_setup();
 
-#endif
+
+
+
+#endif /* SOURCES_IR_DRIVER_H_ */

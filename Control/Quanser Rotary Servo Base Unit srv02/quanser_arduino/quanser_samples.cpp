@@ -16,20 +16,20 @@ static uint16_t timer_count_between_samples = 500;
 
 // FUNCTIONS HEADERS
 int16_t read_int(); // READ A INTEGER VALUE FROM SERIAL
-void return_to_start_position();
-inline void local_delay(uint16_t local_delay);
-void get_quanser_samples(bool move_clockwise, int16_t angle, bool return_with_power, int16_t returning_angle, uint16_t *samples);
-inline void sampling(uint16_t *samples);
+static void return_to_start_position();
+static inline void local_delay(uint16_t local_delay);
+static void get_quanser_samples(bool move_clockwise, int16_t angle, bool return_with_power, int16_t returning_angle, uint16_t *samples);
+static inline void sampling(uint16_t *samples);
 
 /*GET SAMPLES*/
 void generate_quanser_samples(){
   bool move_clockwise = true, return_with_power = true;
   int16_t angle = 0, returning_angle = 0;
   String setup_conditions[2] = {"False", "True"};
-  
+
   Serial.println("Waiting for commands to start");
-  
-  Serial.print("Total Sampling Time [ms, < 3500]: ");
+
+  Serial.print("Total Sampling Time [ms, < 7000]: ");
   uint16_t total_sampling_time_ms = read_int();
   Serial.print(total_sampling_time_ms);
   Serial.println(" ms");
@@ -75,8 +75,8 @@ void generate_quanser_samples(){
 
   // SAMPLING
   Serial.print("Time between samples [Ts]: ");
-  Serial.print((float) timer_count_between_samples / (float) timer_frequency);
-  Serial.println(" seconds\n");
+  Serial.print(1000.0 * ((float) timer_count_between_samples) / ((float) timer_frequency));
+  Serial.println(" ms\n");
 
   Serial.print("Sampling frequency [1/Ts]: ");
   Serial.print(timer_frequency / timer_count_between_samples);
@@ -85,10 +85,12 @@ void generate_quanser_samples(){
 
   // MEASSURE
   int16_t samples[total_samples];
+//  int16_t samples2[total_samples];
   get_quanser_samples(move_clockwise, angle, return_with_power, returning_angle, samples);
 
   // INPUT
   double voltage_values [] = {-5.10, 5.10};
+//  double voltage_values [] = {0.0, 0.0};
   uint16_t min_index_value = 0, last_index = 0;
   Serial.println("ARDUINO INPUT:");
   Serial.print("[");
@@ -99,7 +101,7 @@ void generate_quanser_samples(){
       Serial.print(", ");
       Serial.print(voltage_values[move_clockwise]);
     }
-    
+
     min_index_value = indexes_value_position[2] > total_samples ? total_samples : indexes_value_position[2];
     for(uint16_t k = indexes_value_position[move_clockwise]; k < min_index_value; ++k){
         Serial.print(", ");
@@ -119,8 +121,18 @@ void generate_quanser_samples(){
       Serial.print(", ");
       Serial.print(0.0);
     }
-  
+
   Serial.println("]");
+  
+//  Serial.println("ARDUINO MOTOR:");
+//  Serial.println("ADC VALUE [MAX = 255]:");
+//    Serial.print("[");
+//    Serial.print(samples[0]);
+//    for(uint16_t k = 1; k < total_samples; ++k){
+//      Serial.print(", ");
+//      Serial.print(samples2[k]);
+//    }
+//    Serial.println("]");
 
   Serial.println("ANGLE SYSTEM OUTPUT:");
   Serial.println("WITH ENCODER COUNTER VALUE [MAX = 4096]:");
@@ -151,7 +163,7 @@ void generate_quanser_samples(){
     Serial.print(samples[k] * counter_to_radians);
   }
   Serial.println("]");*/
-
+  delay(1000);
   return;
 }
 
@@ -177,27 +189,45 @@ int16_t read_int(){
 }
 
 
-void get_quanser_samples(bool move_clockwise, int16_t angle, bool return_with_power, int16_t returning_angle, uint16_t *samples){
-  return_to_start_position();
+static void get_quanser_samples(bool move_clockwise, int16_t angle, bool return_with_power, int16_t returning_angle, uint16_t *samples){
+  while(encoder_get_counter_value() != 0){
+    return_to_start_position();
+  }
+  Serial.println("Sampling Process Has Started");
+  delay(1000);
   // RESTART INDEXES
   index = 0;
   indexes_value_position[0] = (uint16_t)(-1);
   indexes_value_position[1] = (uint16_t)(-1);
   indexes_value_position[2] = (uint16_t)(-1);
   not_finnished = true;
+
+
+// MEDICION ENCODER
+  bool release = false;
+  int16_t encoder_position = 0;
+//  Serial.println("Send a value greater than 1 to start meassuring");
+//  Serial.println("Meanwhile you'll see the encoder angle");
+//  while (!release){
+//    if (encoder_get_counter_value() != encoder_position){
+//    encoder_position = encoder_get_counter_value();
+//    Serial.println(encoder_position * 360.0 / 4096.0 );
+//    }
+//    if (Serial.available() > 0){
+//      release = read_int() >= 1;
+//    }
+//  }
   
-  Serial.println("Sampling Process Has Started");
-  delay(1000);
 
   motor_move(move_clockwise, 255);
   TCNT5 = 0;
-  
+
   if (move_clockwise){
     indexes_value_position[0] = index;
     while(encoder_get_counter_value() < angle){
       sampling(samples);
     }
-    
+
     if(return_with_power){
       motor_move(!move_clockwise, 255);
       indexes_value_position[1] = index;
@@ -219,9 +249,9 @@ void get_quanser_samples(bool move_clockwise, int16_t angle, bool return_with_po
       }
     }
   }
-  
+
   motors_stop();
-  
+
   indexes_value_position[2] = index;
   while(index < total_samples){
     sampling(samples);
@@ -229,9 +259,10 @@ void get_quanser_samples(bool move_clockwise, int16_t angle, bool return_with_po
   return;
 }
 
-inline void sampling(uint16_t *samples){
+static inline void sampling(uint16_t *samples){
   if (not_finnished){
   samples[index] = encoder_get_counter_value();
+//  samples2[index] = analogRead(A0);
   ++index;
   local_delay(timer_count_between_samples);
   }
@@ -239,46 +270,66 @@ inline void sampling(uint16_t *samples){
 }
 
 
-inline void local_delay(uint16_t local_delay){
+static inline void local_delay(uint16_t local_delay){
   while(TCNT5 < local_delay){
     // WAIT FOR
   }
   TCNT5 = 0;
 }
 
+
+
 // CALIBRATION OF ZERO
-void return_to_start_position(){
-  if(encoder_get_counter_value == 0){
+static void return_to_start_position(){
+  if(encoder_get_counter_value() == 0){
     return;
   }
   motor_move(true, 255);
-  delay(100);
+  delay(10);
   //Position must be equal to start_position and motors should be off
   //START CONDITIONS
   motors_stop();
   delay(100);
-  float angle = encoder_get_counter_value();
-  float abs_angle = angle > 0 ? angle : -angle;
-  float angle_max_power = 4096.0 / 4.0;
   
+  int16_t angle = encoder_get_counter_value();
+  int16_t abs_angle = angle > 0 ? angle : -angle;
+  int16_t angle_max_power = 4096;
+
+  bool starting_angle_turn = angle < 0;
+  bool new_angle_turn = starting_angle_turn;
   uint16_t max_power = 255;  // 5 v
-  uint16_t min_power = 150; // 0.25 v
+  uint16_t min_power = 20; // 0.25 v
   uint16_t power = 0;
 
   while (angle != 0){
-    motor_move(angle < 0, power);
-    abs_angle = angle > 0 ? angle : -angle;
+    angle = encoder_get_counter_value();
+    starting_angle_turn = angle < 0;
+    new_angle_turn = starting_angle_turn;
+
+    abs_angle = starting_angle_turn ? angle : -angle;
     power = (abs_angle >= angle_max_power) ? max_power : (float)(max_power) * (abs_angle / angle_max_power);
     power = power >= min_power ? power : min_power;
-    delay(2);
+
+    motor_move(starting_angle_turn, power);
+    while ((starting_angle_turn == new_angle_turn) && (angle != 0)){
+      angle = encoder_get_counter_value();
+      new_angle_turn = angle < 0;
+    }
+    
     motors_stop();
+    angle = encoder_get_counter_value();
+    delay (100);
+    while (angle != encoder_get_counter_value()){
+      angle = encoder_get_counter_value();
+      delay (100);
+    }
     delay(100);
     angle = encoder_get_counter_value();
   }
   motors_stop();
   Serial.println("System has return to start position");
   delay(1000);
-  
+
   return true;
 }
 

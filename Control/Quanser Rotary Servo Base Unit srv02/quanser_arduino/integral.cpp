@@ -1,7 +1,7 @@
 #include "integral.h"
 static bool is_integral_set = false;
 /*FUNCTION DECLARATION*/
-void increase_indexes(integral_struct &integral_structure);
+static void increase_indexes(integral_struct &integral_structure);
 
 /*INTEGRAL FUNCTIONS*/
 float integral_get_value(integral_struct &integral_structure){
@@ -23,27 +23,26 @@ float integral_new_value(float value, float sample_separation, integral_struct &
 }
 
 /*INTEGRAL SETUP*/
-bool integral_setup(uint8_t integral_points, integral_struct &integral_structure){
+bool integral_setup(uint8_t integral_points, integral_struct &integral_structure, float *error_integral_array){
   is_integral_set = false;
   if(integral_points > 1){
     integral_structure.integral_points = integral_points;
-    is_integral_set = integral_clear(integral_structure);
+    is_integral_set = integral_clear(integral_structure, error_integral_array);
   }
   return is_integral_set;
 }
 
-bool integral_clear(integral_struct &integral_structure){
+bool integral_clear(integral_struct &integral_structure, float *error_integral_array){
   // INTEGRAL PARAMETERS
   integral_structure.index = 1;
   integral_structure.previous_value = 0.0;
   integral_structure.integral_sum = 0.0;
-  float new_values [integral_structure.integral_points];
-  integral_structure.integral_differential_value = new_values; // NEED REFERENCE &?
+  integral_structure.integral_differential_value = error_integral_array;
   for(uint8_t k = 0; k < integral_structure.integral_points; ++k){
      integral_structure.integral_differential_value[k] = 0;
   }
   integral_structure.is_integral_set = true;
-  return true;
+  return integral_structure.is_integral_set;
 }
 
 void increase_indexes(integral_struct &integral_structure){

@@ -8,7 +8,7 @@ static bool motor_is_set = false;
 // FUNCTIONS DEFINITIONS
 
 //HEADER
-bool motor_move(uint8_t active_motor, uint8_t pasive_motor, uint8_t power);
+static bool motor_move(uint8_t active_motor, uint8_t pasive_motor, uint8_t power);
 
 /*MOTOR MOVE*/
 bool motor_move(bool move_clockwise, uint8_t power){
@@ -20,7 +20,7 @@ bool motor_move(bool move_clockwise, uint8_t power){
     }
 }
 
-bool motor_move(uint8_t active_motor, uint8_t pasive_motor, uint8_t power){
+static bool motor_move(uint8_t active_motor, uint8_t pasive_motor, uint8_t power){
   if (motor_is_set) {
     analogWrite(pasive_motor, 0);
     analogWrite(active_motor, power);
