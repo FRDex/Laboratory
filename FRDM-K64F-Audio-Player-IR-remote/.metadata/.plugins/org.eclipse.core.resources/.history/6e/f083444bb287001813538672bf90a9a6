@@ -1,0 +1,27 @@
+
+#ifndef SOURCES_LED_H_
+#define SOURCES_LED_H_
+
+#include "Template/LDM.h"
+#define RED_LED 0
+#define GREEN_LED 1
+#define BLUE_LED 2
+#define EXT_LED 3
+
+#define PASS_LED 1  //Verde DE LA KINETIS
+#define ID_LED	 2 //Azul de la Kinetis
+
+void LED_PISR (void);
+
+void LED_Init (void);
+
+void toggle_led (unsigned int led_id);
+void set_led (unsigned int led_id,bool ledstate);
+void Led_Blink(uint led_id, uint time, uint freq);
+void Led2_Blink(uint led_id1, uint led_id2, uint time, uint freq);
+bool LED_getTimeOut(void);
+
+
+
+
+#endif /* SOURCES_LED_H_ */

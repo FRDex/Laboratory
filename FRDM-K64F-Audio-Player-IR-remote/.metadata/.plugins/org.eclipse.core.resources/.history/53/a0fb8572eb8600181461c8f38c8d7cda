@@ -1,0 +1,36 @@
+/*
+ * PLAYER.h
+ *
+ *  Created on: 12/7/2018
+ *      Author: tomh6
+ */
+
+#ifndef SOURCES_PLAYER_H_
+#define SOURCES_PLAYER_H_
+
+#include "Template/LDM.h"
+
+typedef struct {
+  unsigned long sector_start;
+  unsigned long sector_end;
+  bool is_16_bit_resolution; // FALSE INDICATE 8 BIT RESOLUTION
+  uint32_t sampling_rate;
+  uint16_t samples_start;
+
+} song_structure;
+
+#define NUMBER_OF_SONGS	10
+static song_structure get_Song_data(unsigned long sector_start);
+
+/*static Track_Data MySongs[NUMBER_OF_SONGS]=  {{0,0,0,0,0},		//0:
+							   	   	   	   	   {0,0,0,0,0},		//1:
+											   {0,0,0,0,0},		//2:
+											   {0,0,0,0,0},		//3:
+											   {0,0,0,0,0},		//4:
+											   {0,0,0,0,0},		//5:
+											   {0,0,0,0,0},		//6:
+											   {0,0,0,0,0},		//7:
+											   {0,0,0,0,0},		//8:
+											   {0,0,0,0,0}};	//9: */
+
+#endif /* SOURCES_PLAYER_H_ */

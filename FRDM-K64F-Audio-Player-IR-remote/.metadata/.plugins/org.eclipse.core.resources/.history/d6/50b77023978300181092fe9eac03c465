@@ -1,0 +1,32 @@
+
+#include "App.h"
+
+#include "PORT.h"
+#include "GPIO.h"
+#include "FTM.h"
+#include "IR_driver.h"
+
+void App_Init (void)
+{
+	PORT_Init();
+	GPIO_Init();
+	FTM_Init();
+	DAC_Init();
+	infrared_setup();
+	SDHC_Init();
+}
+
+uint16_t values[5];
+int index = 0;
+void App_Run (void)
+{
+
+/*	if((infrared_is_data_ready()) && (index<5)){
+		values[index] = infrared_read_data();
+		++index;
+	}
+	else if (index>=5){
+		index=0;
+	}*/
+
+}

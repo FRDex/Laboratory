@@ -1,0 +1,19 @@
+21:55:06 **** Incremental Build of configuration Debug for project Handout1 ****
+make all 
+Building file: ../Sources/SDHC.c
+Invoking: Cross ARM C Compiler
+arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -D"CPU_MK64FN1M0VMD12" -I"../Sources" -I"../Project_Settings/Startup_Code" -I"../SDK/platform/CMSIS/Include" -I"../SDK/platform/devices" -I"../SDK/platform/devices/MK64F12/include" -std=c99 -MMD -MP -MF"Sources/SDHC.d" -MT"Sources/SDHC.o" -c -o "Sources/SDHC.o" "../Sources/SDHC.c"
+../Sources/SDHC.c: In function 'SDHC_sector_read':
+../Sources/SDHC.c:422:18: warning: assignment makes integer from pointer without a cast [enabled by default]
+    SDHC->DSADDR  = dataaddress;
+                  ^
+Finished building: ../Sources/SDHC.c
+ 
+Building target: Handout1.elf
+Invoking: Cross ARM C++ Linker
+arm-none-eabi-g++ -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O0 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections  -g3 -T "MK64FN1M0xxx12_flash.ld" -Xlinker --gc-sections -L"C:/Users/tomh6/Desktop/tp final/Handout1/Project_Settings/Linker_Files" -Wl,-Map,"Handout1.map" -specs=nosys.specs -specs=nano.specs -o "Handout1.elf"  ./Sources/Template/LDM.o ./Sources/Template/main.o  ./Sources/App.o ./Sources/DAC.o ./Sources/FTM.o ./Sources/GPIO.o ./Sources/IR_driver.o ./Sources/PLAYER.o ./Sources/PORT.o ./Sources/SDHC.o ./Sources/SysTick.o  ./Project_Settings/Startup_Code/startup.o ./Project_Settings/Startup_Code/startup_MK64F12.o ./Project_Settings/Startup_Code/system_MK64F12.o   
+Finished building target: Handout1.elf
+ 
+
+21:55:25 Build Finished (took 18s.597ms)
+

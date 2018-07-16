@@ -1,0 +1,194 @@
+/***************************************************************************//**
+  @file     Pin.c
+  @brief    Simple GPIO Pin services
+  @author   Nicolás Magliola
+ ******************************************************************************/
+
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
+
+#include "Pin.h"
+
+#include "PORT.h"
+#include "GPIO.h"
+
+
+/*******************************************************************************
+ * CONSTANT AND MACRO DEFINITIONS USING #DEFINE
+ ******************************************************************************/
+
+#define PIN_PORT_SIMPLE		{0, 0, 0, 0, 0, 0, true, 0, PORT_mGPIO, 0, 0, PORT_eDisabled, 0, 0, 0}
+#define PIN_OUT_PUSHPULL	PIN_PORT_SIMPLE
+
+#define PIN_IN_PULLUP		{1, 1, 0, 0, 0, 0, false, 0, PORT_mGPIO, 0, 0, PORT_eDisabled, 0, 0, 0}
+#define PIN_IN_PULLDOWN		{0, 1, 0, 0, 0, 0, false, 0, PORT_mGPIO, 0, 0, PORT_eDisabled, 0, 0, 0}
+#define PIN_IN_NOPULL		{0, 0, 0, 0, 0, 0, false, 0, PORT_mGPIO, 0, 0, PORT_eDisabled, 0, 0, 0}
+#define TESTBENCH_PIN		{1, 1, 0, 0, 0, 0, false, 0, PORT_mGPIO, 0, 0, PORT_eInterruptFalling, 0, 0, 0}
+#define PIN_IC				{0, 0, 0, 0, 0, 0, true, 0, PORT_mAlt3, 0, 0, PORT_eDisabled, 0, 0, 0}
+
+#define PIN_PWM				{0, 0, 0, 0, 0, 0, true, 0, PORT_mAlt4, 0, 0, PORT_eDisabled, 0, 0, 0}
+#define PIN_PWM2			{0, 0, 0, 0, 0, 0, true, 0, PORT_mAlt3, 0, 0, PORT_eDisabled, 0, 0, 0}
+
+
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+
+typedef struct {
+	PORT_t port;
+	GPIO_t gpio;
+	uint32_t num;
+	PCRstr portConfig;
+	GPIODirection_t dir;
+	GPIOData_t onLevel;
+	GPIOData_t initLevel;
+} pinConfig_t;
+
+
+/*******************************************************************************
+ * VARIABLES WITH GLOBAL SCOPE
+ ******************************************************************************/
+GPIO_Type *PIN_TOWRITE = PTB_BASE;
+uint32_t PIN_TOTOGGLE = 0;
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES FOR PRIVATE FUNCTIONS WITH FILE LEVEL SCOPE
+ ******************************************************************************/
+
+/*******************************************************************************
+ * ROM CONST VARIABLES WITH FILE LEVEL SCOPE
+ ******************************************************************************/
+
+static const pinConfig_t pinList[CANT_PINS] = {
+		//    port,  gpio, PIN,   portConfig,       dir,     onLevel,  initLevel
+
+		/***********************************************************/
+		/*********************OTHER**********************************/
+		/***********************************************************/
+		{ PORTC,  PTC,   6,  TESTBENCH_PIN, 	GPIO__IN,  GPIO__LO, GPIO__HI}, // PIN_BUTT_SW2
+		{ PORTB,  PTB,   3,  PIN_OUT_PUSHPULL, 	GPIO__OUT, GPIO__HI, GPIO__HI},  // PB3
+		{ PORTB,  PTB,   19, PIN_OUT_PUSHPULL, 	GPIO__OUT, GPIO__HI, GPIO__HI}, // PB19
+		{ PORTB,  PTB,   11, PIN_OUT_PUSHPULL, 	GPIO__OUT, GPIO__HI, GPIO__HI}, // PB11
+		{ PORTB,  PTB,   2,  PIN_OUT_PUSHPULL, 	GPIO__OUT, GPIO__HI, GPIO__HI},  // PB2
+		{ PORTC,  PTC,   1,  PIN_PWM, 			GPIO__OUT, GPIO__LO, GPIO__HI }, // PIN_PWM
+		{ PORTC,  PTC,   8,  PIN_PWM2,   		GPIO__OUT, GPIO__LO, GPIO__HI }, // PINPWM2
+		{ PORTC,  PTC,   9,  PIN_IC,   			GPIO__IN,  GPIO__LO, GPIO__HI }, //PIN IC
+		{ PORTD,  PTD,   1,  PIN_IN_PULLUP	,	GPIO__IN,  GPIO__LO, GPIO__HI }, // PIN_IR
+		{ PORTE,  PTE,   6, PIN_IN_PULLDOWN,   GPIO__IN,  GPIO__LO, GPIO__HI } // PIN_SD_DETECT
+
+};
+
+/*******************************************************************************
+ * STATIC VARIABLES AND CONST VARIABLES WITH FILE LEVEL SCOPE
+ ******************************************************************************/
+
+/*******************************************************************************
+ *******************************************************************************
+                        GLOBAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/
+
+void Pin_Init (void)
+{
+	uint8_t k =0;
+	const pinConfig_t* pin;
+	static uint8_t yaInit = false;
+	if (yaInit)
+		return;
+
+	PORT_Init();
+	GPIO_Init();
+
+	for (pin=pinList ; pin<pinList+CANT_PINS; ++pin)
+	{
+		k++;
+		PORT_Configure2(pin->port, pin->num, pin->portConfig);
+		GPIO_SetDirection(pin->gpio, pin->num, pin->dir);
+		if (pin->dir == GPIO__OUT)
+		{
+			GPIO_Write(pin->gpio, pin->num, pin->initLevel);
+		}
+	}
+
+	PIN_TOTOGGLE =(uint32_t) &(PIN_TOWRITE->PDOR);
+}
+
+
+void Pin_Write (pinName_t pin, bool val)
+{
+	if (pin<CANT_PINS && pinList[pin].dir==GPIO__OUT)
+	{
+		GPIO_Write(pinList[pin].gpio, pinList[pin].num, !val == !(pinList[pin].onLevel));
+	}
+}
+
+void Pin_Set (pinName_t pin)
+{
+	if (pin<CANT_PINS && pinList[pin].dir==GPIO__OUT)
+	{
+		if (pinList[pin].onLevel)
+			GPIO_Set(pinList[pin].gpio, pinList[pin].num);
+		else
+			GPIO_Clear(pinList[pin].gpio, pinList[pin].num);
+	}
+}
+
+void Pin_Clear (pinName_t pin)
+{
+	if (pin<CANT_PINS && pinList[pin].dir==GPIO__OUT)
+	{
+		if (pinList[pin].onLevel)
+			GPIO_Clear(pinList[pin].gpio, pinList[pin].num);
+		else
+			GPIO_Set(pinList[pin].gpio, pinList[pin].num);
+	}
+}
+
+void Pin_Toggle (pinName_t pin)
+{
+	if (pin<CANT_PINS && pinList[pin].dir==GPIO__OUT)
+	{
+		GPIO_Toggle(pinList[pin].gpio, pinList[pin].num);
+	}
+}
+
+bool Pin_Read (pinName_t pin)
+{
+	bool rta = false;
+	if (pin<CANT_PINS)
+	{
+		rta = !(pinList[pin].onLevel) == !(GPIO_Read(pinList[pin].gpio, pinList[pin].num));
+	}
+	return rta;
+}
+
+bool Pin_IsInterruptPending (pinName_t pin)
+{
+	bool rta = false;
+	if (pin<CANT_PINS)
+	{
+		if(PORT_IsInterruptPending(pinList[pin].port ,pinList[pin].num)==true)
+		{
+			rta = true;
+		}
+
+	}
+	return rta;
+
+}
+
+void Pin_ClearInterruptFlag (pinName_t pin)
+{
+	if (pin<CANT_PINS)
+	{
+		PORT_ClearInterruptFlag  (pinList[pin].port ,pinList[pin].num );
+	}
+}
+
+
+/*******************************************************************************
+ *******************************************************************************
+                        LOCAL FUNCTION DEFINITIONS
+ *******************************************************************************
+ ******************************************************************************/

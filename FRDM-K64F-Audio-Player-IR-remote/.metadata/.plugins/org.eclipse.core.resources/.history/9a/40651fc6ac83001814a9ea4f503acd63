@@ -1,0 +1,89 @@
+/***************************************************************************//**
+  @file     Pin.h
+  @brief    Simple GPIO Pin services
+  @author   Nicolás Magliola
+ ******************************************************************************/
+
+#ifndef _PIN_H_
+#define _PIN_H_
+
+/*******************************************************************************
+ * INCLUDE HEADER FILES
+ ******************************************************************************/
+
+#include <stdint.h>
+#include <stdbool.h>
+
+/*******************************************************************************
+ * ENUMERATIONS AND STRUCTURES AND TYPEDEFS
+ ******************************************************************************/
+
+extern uint32_t PIN_TOTOGGLE;
+
+ typedef enum {
+	/**********************************************8
+	 * PORT OTHER
+	 */
+	BUTT_SW2,
+	PINB_1,	//PB3
+	PINB_2,	//PB19
+	PINB_3,	//PB11
+	PINB_4,	//PTB2
+	PWM,	//PWM
+	PWM2,
+	PIN_IC,
+	PIN_IR,
+	PIN_SD_DETECT,
+	CANT_PINS
+} pinName_t;
+
+
+/*******************************************************************************
+ * FUNCTION PROTOTYPES WITH GLOBAL SCOPE
+ ******************************************************************************/
+/**
+ * @brief Inicializa el módulo
+*/
+void Pin_Init (void);
+
+/**
+ * @brief Escribe un valor en un pin digital
+ * @param pin ID del pin
+ * @param val Valor digital a escribir
+*/
+void Pin_Write (pinName_t pin, bool val);
+
+/**
+ * @brief Enciende (set) un pin digital
+ * @param pin ID del pin
+*/
+void Pin_Set (pinName_t pin);
+
+/**
+ * @brief Apaga (clear) un pin digital
+ * @param pin ID del pin
+*/
+void Pin_Clear (pinName_t pin);
+
+/**
+ * @brief Togglea un pin digital
+ * @param pin ID del pin
+*/
+void Pin_Toggle (pinName_t pin);
+
+/**
+ * @brief Lee un pin digital
+ * @param pin ID del pin
+ * @return Valor digital del pin
+*/
+bool Pin_Read (pinName_t pin);
+
+bool Pin_IsInterruptPending (pinName_t pin);
+
+void Pin_ClearInterruptFlag (pinName_t pin);
+
+
+/*******************************************************************************
+ ******************************************************************************/
+
+#endif // _PIN_H_

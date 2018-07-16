@@ -1,0 +1,77 @@
+
+#include "App.h"
+#include "SysTick.h"
+#include "PORT.h"
+#include "GPIO.h"
+#include "FTM.h"
+#include "IR_driver.h"
+#include "SDHC.h"
+#include "DAC.h"
+#include "PLAYER.h"
+
+void App_Init (void)
+{
+	SysTick_Init();
+	PORT_Init();
+	GPIO_Init();
+	FTM_Init();
+	dac_setup();
+	infrared_setup();
+	SDHC_Init();
+	if(SDHC_isReady()){
+//		player_setup();
+	}
+
+}
+unsigned char buffer1[512];
+unsigned char buffer2[512];
+
+void App_Run (void)
+{
+//	static uint16_t max_value_dac = 1 << 12;
+//	static uint16_t k = 0;
+//
+//
+//	for(uint16_t j = 0; j <= k; ++j){
+//	    for(uint16_t m = 0; m <= j; ++m){
+//	         dac_player(m, m);
+//	    }
+//	    for(uint16_t m = j; m >= 0; --m){
+//	         dac_player(m, m);
+//	    }
+//	}
+//
+//	++k;
+//	if (k >= max_value_dac){
+//	   k = 0;
+//	}
+	/*uint32_t sector1= 839;
+	bool newCard = SDHC_isCardInserted();
+		if(newCard && SDHC_isReady()){
+			player_play(sector1);
+		}
+		else
+			SDHC_detectsdcard();
+			*/
+//	int index=1;
+//	unsigned long sector1= 839;
+//	unsigned long sector2 = 88647;
+//	bool newCard = SDHC_isCardInserted();
+//	if(newCard && SDHC_isReady()){
+//		SDHC_sector_read(buffer1,sector1);
+//		SDHC_sector_read(buffer2,sector2);
+//		index=index;
+//	}
+//	else
+//		SDHC_detectsdcard();
+	static uint16_t values[5];
+	static int index = 0;
+	if((infrared_is_data_ready()) && (index<5)){
+		values[index] = infrared_read_data();
+		++index;
+	}
+	else if (index>=5){
+		index=0;
+	}
+
+}

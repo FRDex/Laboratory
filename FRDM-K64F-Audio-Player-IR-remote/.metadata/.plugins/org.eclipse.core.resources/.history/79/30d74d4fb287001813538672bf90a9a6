@@ -1,0 +1,56 @@
+
+#include "App.h"
+
+#include "PORT.h"
+#include "GPIO.h"
+#include "FTM.h"
+#include "IR_driver.h"
+#include "SDHC.h"
+#include "DAC.h"
+#include "PLAYER.h"
+
+void App_Init (void)
+{
+	PORT_Init();
+	GPIO_Init();
+	FTM_Init();
+	DAC_Init();
+	infrared_setup();
+	SDHC_Init();
+	dac_setup();
+	if(SDHC_isReady()){
+		player_setup();
+	}
+
+}
+
+void App_Run (void)
+{
+	/*uint32_t sector1= 839;
+	bool newCard = SDHC_isCardInserted();
+		if(newCard && SDHC_isReady()){
+			player_play(sector1);
+		}
+		else
+			SDHC_detectsdcard();
+			*/
+
+/*	unsigned long sector1= 615;
+	unsigned long sector2 = 79049;
+	bool newCard = isCardInserted();
+	if(newCard && isSDHCReady()){
+		block_read(buffer1,sector1);
+		block_read(buffer2,sector2);
+		index=index;
+	}
+	else
+		detectsdcard();*/
+/*	if((infrared_is_data_ready()) && (index<5)){
+		values[index] = infrared_read_data();
+		++index;
+	}
+	else if (index>=5){
+		index=0;
+	}*/
+
+}

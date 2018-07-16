@@ -1,0 +1,19 @@
+
+#ifndef SOURCES_SYSTICK_H_
+#define SOURCES_SYSTICK_H_
+
+#include "Template/LDM.h"
+
+//__ISR__       SysTick_Handler (void);
+
+void 	 	  SysTick_Init 	  (void);
+
+uint registerCallback(void (*fun)(), uint16_t fun_freq);
+uint16_t getSysFreq(void);
+void setSysFreq (uint16_t freq);
+bool setCallback_Freq(uint callback_index, uint16_t fun_freq);
+
+
+#endif
+
+//FALTA funcion que sea registrar CALLBACK que sea llamada desde la inicialización de LED y me de la direccion de la función a la que quiero llamar.

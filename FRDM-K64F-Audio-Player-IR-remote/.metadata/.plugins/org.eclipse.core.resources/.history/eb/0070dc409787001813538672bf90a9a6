@@ -1,0 +1,205 @@
+
+#include "SysTick.h"
+#include "math.h"
+#define TOTAL_CALLBACKS 5
+
+static void (*interruptFun[TOTAL_CALLBACKS])();
+static uint16_t funPrescaler[TOTAL_CALLBACKS];
+static unsigned int wasInit = 0;
+static unsigned int loaded_callbacks = 0;
+
+__ISR__  SysTick_Handler (void)
+{
+	int i;
+	static uint16_t sys_cycles = 0;
+	//LED_PISR();
+	//(*(interruptFun[0][0]))();
+	for(i=0; interruptFun[i] != NULL; i++)
+	{
+		if(!(sys_cycles%funPrescaler[i])){
+			(*interruptFun[i])();
+		}
+	}
+	++sys_cycles;
+}
+
+static uint16_t freqDiv = 10000L-1;
+void SysTick_Init (void)
+{
+	int i;
+
+	if(!wasInit)
+	{
+		SysTick->CTRL = 0x00;
+		SysTick->LOAD = freqDiv; //12499999L; // <= 125 ms @ 100Mhz
+		SysTick->VAL  = 0x00;
+		SysTick->CTRL = SysTick_CTRL_CLKSOURCE_Msk | SysTick_CTRL_TICKINT_Msk | SysTick_CTRL_ENABLE_Msk;
+		for(i=0; i<TOTAL_CALLBACKS; i++)
+		{
+			interruptFun[i]=NULL;
+		}
+		wasInit = 1;
+	}
+}
+
+unsigned int registerCallback(void (*fun)(), uint16_t fun_freq)
+{
+
+	unsigned int i=0;
+	unsigned int end = 0;
+	while(!end)
+	{
+		if(interruptFun[i] == NULL)
+		{
+			++loaded_callbacks;
+			interruptFun[i] = fun;
+			setCallback_Freq(i, fun_freq);
+			end = 1;
+		}
+		else
+		{
+			++i;
+		}
+	}
+	return i; // function callback index
+}
+
+bool setCallback_Freq(unsigned int callback_index, uint16_t fun_freq){
+	if (callback_index < loaded_callbacks){
+		uint16_t fun_preScaler = 1;
+		if (fun_freq < getSysFreq()){
+			fun_preScaler = rint(100000000/fun_freq);
+		}
+		funPrescaler[callback_index] = fun_preScaler;
+		return true;
+	}
+	else return false;
+
+}
+
+void setSysFreq (uint16_t freq){
+	freqDiv = (100000000/freq)-1;
+	SysTick->LOAD = freqDiv;
+}
+uint16_t getSysFreq(void)
+{
+	return (100000000/freqDiv);
+}
+
+
+/*
+ * FUNCION DEX
+ *
+ #include <iostream>
+#define n_funs 5
+
+using namespace std;
+
+void nothing_fun (void);
+void(*funs[n_funs])(void)={nothing_fun,nothing_fun,nothing_fun,nothing_fun,nothing_fun};
+
+void fun1 (void);
+void fun2 (void);
+
+
+void funloader (void(*fun)(void));
+void funloader (void(*fun)(void),int num);
+
+void excec_fun (void);
+
+
+int main()
+{
+    funloader(fun2,1);
+    funloader(fun2,3);
+    funloader(fun2,5);
+    funloader(fun1);
+    funloader(fun1);
+    funloader(fun1);
+    funloader(fun1);
+    funloader(fun1);
+
+    excec_fun();
+    /*(funs[0])();
+    (funs[1])();*
+    cout<< ((1>0) ? 2:3) <<endl;
+
+    cout << "Hello world!" << endl;
+    return 0;
+}
+
+void fun1 (void){
+    cout<<"DEXTER"<<endl;
+}
+
+void fun2 (void){
+    cout<<"DIABLO"<<endl;
+}
+
+
+
+/**
+ESTA FUNCION TE PERMITE CARGAR PUNTEROS A FUNCION EN TIEMPO REAL
+PERMITIENDO REALIZAR UN SET DE n_funs FUNCIONES.
+LO INTERESANTE DE LA FUNCION ES QUE PERMITE HACER MAS DE UNA FUNCION POR EVENTO,
+GENERANDO LA POSIBILIDAD DE DESENCADENAR MAS DE UNA FUNCION POR CICLO Y FACILITANDO LA
+DIAGRAMACIÓN DE PROGRAMAS MAS MODULARES
+**
+int f_index=0;
+void funloader (void(*fun)(void),int num){
+    ///INDICE DE LAS FUNCIONES
+    int index;
+
+    ///CASOS LIMITES
+        if((num<0)&&(f_index>=n_funs)){
+        cout<<"Function index limit has been reached";
+        return;
+        }
+        else{
+        index=f_index;
+        }
+
+
+        if(num>=n_funs){
+        cout<<"Specified function index out of range"<<endl;
+        return;
+        }
+        else{
+            if(num>0)
+            {
+                index=num;
+            }
+        }
+
+    ///CARGO EL MAYOR NUMERO DE K
+        f_index=((num>f_index) ? num:f_index);
+
+
+    ///CARGO LA FUNCION EN EL ARREGLO
+        funs[index]=fun;
+
+    ///CARGO EL PROXIMO VALOR DE f_index
+        ++f_index;
+        f_index=((n_funs>f_index) ? f_index:n_funs);
+        cout<<f_index<<endl;
+
+        return;
+}
+
+void funloader (void(*fun)(void)){
+    funloader (fun,-1);
+    return;
+}
+
+void excec_fun (void){
+    for(int i=0;i<f_index;++i){
+        funs[i]();
+    }
+}
+
+
+void nothing_fun (void){
+    return;
+}
+
+ */

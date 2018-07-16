@@ -1,0 +1,26 @@
+/*
+ * PLAYER.h
+ *
+ *  Created on: 12/7/2018
+ *      Author: tomh6
+ */
+
+#ifndef SOURCES_PLAYER_H_
+#define SOURCES_PLAYER_H_
+
+#include "Template/LDM.h"
+
+#define NUMBER_OF_SONGS	10
+
+/*static Track_Data MySongs[NUMBER_OF_SONGS]=  {{0,0,0,0,0},		//0:
+							   	   	   	   	   {0,0,0,0,0},		//1:
+											   {0,0,0,0,0},		//2:
+											   {0,0,0,0,0},		//3:
+											   {0,0,0,0,0},		//4:
+											   {0,0,0,0,0},		//5:
+											   {0,0,0,0,0},		//6:
+											   {0,0,0,0,0},		//7:
+											   {0,0,0,0,0},		//8:
+											   {0,0,0,0,0}};	//9: */
+
+#endif /* SOURCES_PLAYER_H_ */
