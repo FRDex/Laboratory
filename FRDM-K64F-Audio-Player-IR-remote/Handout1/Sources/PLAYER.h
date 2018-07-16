@@ -2,7 +2,7 @@
  * PLAYER.h
  *
  *  Created on: 12/7/2018
- *      Author: El Diablo & Dexter
+ *      Author: Tomas & Dexter
  */
 
 #ifndef SOURCES_PLAYER_H_

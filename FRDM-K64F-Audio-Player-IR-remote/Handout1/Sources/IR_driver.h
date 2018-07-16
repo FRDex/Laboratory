@@ -2,7 +2,7 @@
  * IR_driver.h
  *
  *  Created on: 3/7/2018
- *      Author: tomh6
+ *      Author: Tomas & Dexter
  */
 
 #ifndef SOURCES_IR_DRIVER_H_

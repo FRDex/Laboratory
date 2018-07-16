@@ -2,7 +2,7 @@
  * FTM.h
  *
  *  Created on: 4/7/2018
- *      Author: tomh6
+ *      Author: Tomas & Dexter
  */
 
 #ifndef SOURCES_FTM_H_

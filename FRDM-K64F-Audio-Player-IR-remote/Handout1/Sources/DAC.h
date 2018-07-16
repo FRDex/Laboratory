@@ -2,7 +2,7 @@
  * DAC.h
  *
  *  Created on: 9/7/2018
- *      Author: tomh6
+ *      Author: Tomas & Dexter
  */
 
 #ifndef SOURCES_DAC_H_

@@ -2,7 +2,7 @@
  * SDHC.h
  *
  *  Created on: 9/7/2018
- *      Author: tomh6
+ *      Author: Tomas & Dexter
  */
 #ifndef SDHC_H_
 #define SDHC_H_
