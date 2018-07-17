@@ -3,23 +3,49 @@
 #include "quanser_motor.h"
 #include "potentiometer.h"
 
+// PIO
 static uint8_t encoder_clockwise_pin = 2, encoder_counterclockwise_pin = 3;
 static uint8_t motor_clockwise_pin = 6, motor_counterclockwise_pin = 5;
 static uint8_t potentiometer_pin = A0;
 
+// MAGNITUDE CONVERSION
 static const float counter_to_radians = PI / 2048.0;
 static const float counters_to_degrees = 180.0 / 2048.0;
 static const float degrees_to_counters = 2048.0 / 180.0;
 static const float degrees_to_radians = PI / 180.0;
 
+// STARTING ANGLE REFERENCE FROM ZERO
 static int16_t angle_reference = 180.0 * degrees_to_radians / counter_to_radians;
-static uint8_t timer_prescaller_value = 1;
 
+// TIMER CONFIGURATION
+static uint8_t timer_prescaller_value = 1;
+static const float timer_frequency = 16e6;
+
+// LOCAL FUNCTION HEADERS
 bool setup_system_to_zero_position();
 bool timer_setup(bool active_noise_canceler = false, uint8_t prescaller_value = 1);
 int16_t read_integers();
 
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////// - VARIABLES PID - /////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+// MOTOR VARIABLES
+static uint8_t max_power_output = 255; // 5V
+static uint8_t min_power_output = 30;  // 0.59V
+
+// ERROR TOLERANCE
+static int16_t min_positive_angle_tolerance = (1.0 * (float)(degrees_to_counters));
+static int16_t min_negative_angle_tolerance = - min_positive_angle_tolerance;
+
+// PID GAINS
+static float proportional_gain = 350.0 * counter_to_radians;
+static float differential_gain = 100.0 * counter_to_radians * timer_frequency / timer_prescaller_value;
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////// - VARIABLES PID - /////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void setup() {
   Serial.begin(9600);
@@ -49,28 +75,36 @@ void setup() {
   Serial.println(setup_conditions[timer_setup(false, timer_prescaller_value)]);
   TCNT5 = 0;
 
-Serial.println("Envia un numero para cambiar las constantes");
+  Serial.println();
+  Serial.println("Configuración Inicial del PID");
+  
+  Serial.print("La ganancia proporcional: ");
+  Serial.println((float)proportional_gain / (float)counter_to_radians);
+  Serial.print("La ganancia diferencial: ");
+  Serial.println((float)(differential_gain) * timer_prescaller_value / (float)(counter_to_radians * timer_frequency));
+  Serial.print("Potencia minima: ");
+  Serial.println(min_power_output);
+  Serial.print("Tolerancia maxima: ");
+  Serial.println((float) (min_positive_angle_tolerance) / (float)(degrees_to_counters));
+  
+  Serial.print("Angulo de la maxima potencia [grados]: ");
+  Serial.println(((float)(max_power_output) / (float)(proportional_gain)) * counters_to_degrees);
+  Serial.print("Maxima Tension: ");
+  Serial.println(max_power_output);
+  Serial.print("Minimo Angulo [grados]: ");
+  Serial.println(((float)(min_power_output) / (float)(proportional_gain)) * counters_to_degrees);
+  Serial.print("Minima Tension: ");
+  Serial.println(min_power_output);
+  Serial.print("Tolerancia [grados]: ");
+  Serial.println((float)(min_positive_angle_tolerance) * counters_to_degrees);
+  Serial.println(); 
+
+
+  Serial.println("Envia un numero para cambiar los parametros");
   
 }
 
 
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////// - VARIABLES INICIALES - ///////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    static const float timer_frequency = 16e6;
-    
-    // MOTOR VARIABLES
-    static uint8_t max_power_output = 255; // 5V
-    static uint8_t min_power_output = 30;  // 0.59V
-
-    // ERROR TOLERANCE
-    static int16_t min_positive_angle_tolerance = (1.0 * (float)(degrees_to_counters));
-    static int16_t min_negative_angle_tolerance = - min_positive_angle_tolerance;
-
-    // PID GAINS
-    static float proportional_gain = 500 * counter_to_radians;
-    static float differential_gain = 10.0 * counter_to_radians * timer_frequency / timer_prescaller_value;
     
 void loop() {
   
@@ -88,10 +122,10 @@ void loop() {
     static float power_output = 0;
 
   // ERROR AND TIME SEPARATION
-  error = angle_reference - encoder_get_counter_value();
-  time_separation = TCNT5;
-  error_difference = error - prev_error;
-  prev_error = error;
+    error = angle_reference - encoder_get_counter_value();
+    time_separation = TCNT5;
+    error_difference = error - prev_error;
+    prev_error = error;
 
   // ANGLE MODULE
   error_difference = error_difference > 2048 ? error_difference - 4096: error_difference;
@@ -114,28 +148,12 @@ void loop() {
   if(Serial.available() > 0){
     motors_stop();
     read_integers();
-    Serial.print("Maximum Angle [degrees]: ");
-    Serial.println(((float)(max_power_output) / (float)(proportional_gain)) * counters_to_degrees);
-    Serial.print("Max Power: ");
-    Serial.println(max_power_output);
-    Serial.print("Minimum Angle [degrees]: ");
-    Serial.println(((float)(min_power_output) / (float)(proportional_gain)) * counters_to_degrees);
-    Serial.print("Min Power: ");
-    Serial.println(min_power_output);
-    Serial.print("Tolerance: ");
-    Serial.println((float)(min_positive_angle_tolerance) * counters_to_degrees);
-    Serial.println();
-    Serial.print("Actual Angle [degrees]: ");
-    Serial.println(error * counter_to_radians);
-    Serial.print("Actual Power: ");
-    Serial.println(power_output);
-    Serial.println();
 
     static int16_t dummy;
 
     Serial.print("Introducir la ganancia proporcional: ");
     dummy = read_integers();
-    if(dummy > 0)
+    if(dummy >= 0)
     {
         Serial.println(dummy);
         proportional_gain = ((float)(dummy)) * counter_to_radians;
@@ -150,7 +168,7 @@ void loop() {
 
     Serial.print("Introducir la ganancia diferencial: ");
     dummy = read_integers();
-    if(dummy > 0)
+    if(dummy >= 0)
     {
         Serial.println(dummy);
         differential_gain = ((float)(dummy)) * counter_to_radians * timer_frequency / timer_prescaller_value;
@@ -165,7 +183,7 @@ void loop() {
 
     Serial.print("Introducir la potencia minima: ");
     dummy = read_integers();
-    if(dummy > 0)
+    if(dummy >= 0)
     {
         Serial.println(dummy);
         min_power_output = dummy;  // 0.78V
@@ -179,7 +197,7 @@ void loop() {
     
     Serial.print("Introducir la tolerancia maxima: ");
     dummy = read_integers();
-    if(dummy > 0)
+    if(dummy >= 0)
     {
         Serial.println(dummy);
         min_positive_angle_tolerance = (dummy * (float)(degrees_to_counters));
@@ -192,24 +210,25 @@ void loop() {
         Serial.println(); 
     }
 
-    Serial.print("Maximum Angle [degrees]: ");
+
+    Serial.print("Angulo maximo [grados]: ");
     Serial.println(((float)(max_power_output) / (float)(proportional_gain)) * counters_to_degrees);
-    Serial.print("Max Power: ");
+    Serial.print("Maxima Tension: ");
     Serial.println(max_power_output);
-    Serial.print("Minimum Angle [degrees]: ");
+    Serial.print("Angulo minimo [grados]: ");
     Serial.println(((float)(min_power_output) / (float)(proportional_gain)) * counters_to_degrees);
-    Serial.print("Min Power: ");
+    Serial.print("Minima Tension: ");
     Serial.println(min_power_output);
-    Serial.print("Tolerance: ");
+    Serial.print("Tolerancia: ");
     Serial.println((float)(min_positive_angle_tolerance) * counters_to_degrees);
     Serial.println();
-    Serial.print("Actual Angle [degrees]: ");
+    Serial.print("Angulo actual [grados]: ");
     Serial.println(error * counter_to_radians);
-    Serial.print("Actual Power: ");
+    Serial.print("Tension actual: ");
     Serial.println(power_output);
     Serial.println();  
     
-    Serial.println("Envia un numero para cambiar las constantes");
+    Serial.println("Envia un numero para cambiar los parametros");
     TCNT5 = 0;
   }
   
@@ -230,6 +249,9 @@ int16_t read_integers(){
   int16_t sign  = 1;
   while(Serial.available() > 0){
     dato = Serial.read();
+    if(dato == '.'){
+      return (-1);
+    }
     if (dato == '-'){
       sign *= -1;
     }
@@ -241,6 +263,7 @@ int16_t read_integers(){
   result *= sign;
   return result;
 }
+
 
 bool timer_setup(bool active_noise_canceler, uint8_t prescaller_value){
    // MASK INTERRUPTS
@@ -260,9 +283,6 @@ bool timer_setup(bool active_noise_canceler, uint8_t prescaller_value){
   TCNT5 = 0;
   return true;
 }
-
-
-
 
 
 // CALIBRATION OF ZERO
@@ -286,16 +306,11 @@ bool setup_system_to_zero_position(){
 
   while (angle != potenciometer_0_degrees_value){
     angle = analogRead(potentiometer_pin);
-//    Serial.print("Angulo actual: ");
-//    Serial.println(angle);
-//    Serial.print("Angulo de referencia: ");
-//    Serial.println(potenciometer_0_degrees_value);
+
     
     if (angle > potenciometer_0_degrees_value){
       power = (angle >= max_angle) ? max_power : max_power * (angle - potenciometer_0_degrees_value) / (max_angle - potenciometer_0_degrees_value);
       power = (power <= min_power) ? min_power : power;
-//      Serial.print("Energía del motor counterclockwise: ");
-//      Serial.println(power);
       motor_move(counterclockwise, power);
       while (angle > potenciometer_0_degrees_value){
         angle = analogRead(potentiometer_pin);    
@@ -304,23 +319,18 @@ bool setup_system_to_zero_position(){
     else if(angle < potenciometer_0_degrees_value){
       power = (angle <= min_angle) ? max_power : max_power * (potenciometer_0_degrees_value - angle) / (potenciometer_0_degrees_value - min_angle);
       power = (power <= min_power) ? min_power : power;
-//      Serial.print("Energía del motor clockwise: ");
-//      Serial.println(power);
       motor_move(clockwise, power);
       while (angle < potenciometer_0_degrees_value){
         angle = analogRead(potentiometer_pin);
-//        Serial.println(angle);
       }
     }
     delay(1);
     motors_stop();
-//    Serial.println("Motores Apagados");
     angle = analogRead(potentiometer_pin);
     delay (100);
     while (angle != analogRead(potentiometer_pin)){
       angle = analogRead(potentiometer_pin);
       delay (100);
-//      Serial.println(angle);
     }
     delay(100);
     angle = analogRead(potentiometer_pin);
