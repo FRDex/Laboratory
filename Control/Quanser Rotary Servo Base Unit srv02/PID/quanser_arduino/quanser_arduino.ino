@@ -73,7 +73,6 @@ void setup() {
 
   Serial.print("Timer Setup is correct? ");
   Serial.println(setup_conditions[timer_setup(false, timer_prescaller_value)]);
-  TCNT5 = 0;
 
   Serial.println();
   Serial.println("Configuración Inicial del PID");
@@ -101,7 +100,7 @@ void setup() {
 
 
   Serial.println("Envia un numero para cambiar los parametros");
-  
+  TCNT5 = 0;
 }
 
 
@@ -124,6 +123,7 @@ void loop() {
   // ERROR AND TIME SEPARATION
     error = angle_reference - encoder_get_counter_value();
     time_separation = TCNT5;
+    TCNT5 = 0;
     error_difference = error - prev_error;
     prev_error = error;
 
